@@ -1,0 +1,70 @@
+# ─── Dependencies ───────────────────────────────────────────────────────────
+# node_modules is the folder where all downloaded packages live.
+# It can be 500MB+. Anyone can recreate it with "pnpm install".
+# Never commit it — it would make your repo enormous.
+node_modules/
+
+# pnpm's internal cache folder
+.pnpm-store/
+
+# ─── Environment files ───────────────────────────────────────────────────────
+# These files contain SECRETS — GitHub OAuth keys, database passwords,
+# JWT signing keys. If these go to GitHub, anyone can steal them.
+# NEVER commit these. Ever.
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# ─── Build output ────────────────────────────────────────────────────────────
+# When you run "pnpm build", it compiles TypeScript into JavaScript
+# and puts it in a dist/ or build/ folder. This is regeneratable —
+# no need to commit it, it gets rebuilt on every deployment.
+dist/
+build/
+.next/
+out/
+
+# ─── Database ────────────────────────────────────────────────────────────────
+# SQLite local dev databases (we use PostgreSQL but just in case)
+*.db
+*.db-journal
+*.sqlite
+
+# ─── Editor files ────────────────────────────────────────────────────────────
+# VS Code saves your personal editor settings here.
+# Your settings are yours — not part of the project.
+.vscode/settings.json
+.vscode/launch.json
+
+# Keep this file — it lets everyone on the team use the same extensions
+!.vscode/extensions.json
+
+# JetBrains editors (WebStorm, IntelliJ)
+.idea/
+
+# ─── Operating system files ──────────────────────────────────────────────────
+# Mac creates these invisible files in every folder. Useless to others.
+.DS_Store
+.DS_Store?
+
+# Windows creates these
+Thumbs.db
+ehthumbs.db
+
+# ─── Logs ────────────────────────────────────────────────────────────────────
+# Log files grow forever and contain runtime info, not source code.
+*.log
+logs/
+npm-debug.log*
+pnpm-debug.log*
+
+# ─── TypeScript ──────────────────────────────────────────────────────────────
+# TypeScript's build info cache. Regenerated automatically.
+*.tsbuildinfo
+
+# ─── Testing ─────────────────────────────────────────────────────────────────
+# Test coverage reports are generated, not written by you.
+coverage/
+.nyc_output/
