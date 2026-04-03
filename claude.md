@@ -16,13 +16,13 @@ simply with comments in code. Production-level quality throughout.
 PHASE 1 IN PROGRESS — Foundation & Authentication
 
 ## Phase 1 checklist
-- [ ] Step 1: Prerequisites verified
-- [ ] Step 2: GitHub repo created + Git initialised
-- [ ] Step 3: Monorepo folder scaffold
-- [ ] Step 4: Root config files (pnpm workspace, tsconfig, gitignore)
-- [ ] Step 5: Shared types package
-- [ ] Step 6: API app scaffold
-- [ ] Step 7: React web app scaffold
+- [x] Step 1: Prerequisites verified
+- [x] Step 2: GitHub repo created + Git initialised  
+- [x] Step 3: Monorepo folder scaffold
+- [x] Step 4: Root config files (pnpm workspace, tsconfig, gitignore)
+- [x] Step 5: Shared types package
+- [x] Step 6: API app scaffold
+- [x] Step 7: React web app scaffold
 - [ ] Step 8: Docker setup — all 3 containers running
 - [ ] Step 9: Prisma schema + first migration
 - [ ] Step 10: GitHub OAuth backend
