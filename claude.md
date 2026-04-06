@@ -23,8 +23,8 @@ PHASE 1 IN PROGRESS — Foundation & Authentication
 - [x] Step 5: Shared types package
 - [x] Step 6: API app scaffold
 - [x] Step 7: React web app scaffold
-- [ ] Step 8: Docker setup — all 3 containers running
-- [ ] Step 9: Prisma schema + first migration
+- [x] Step 8: Docker setup — all 3 containers running
+- [x] Step 9: Prisma schema + first migration
 - [ ] Step 10: GitHub OAuth backend
 - [ ] Step 11: React auth layer (context, hooks, protected routes)
 - [ ] Step 12: End-to-end login test
