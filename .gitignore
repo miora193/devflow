@@ -68,3 +68,6 @@ pnpm-debug.log*
 # Test coverage reports are generated, not written by you.
 coverage/
 .nyc_output/
+
+# Local env override (for running Prisma outside Docker)
+.env.local

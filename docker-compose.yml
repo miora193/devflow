@@ -1,0 +1,140 @@
+# docker-compose.yml
+# ─────────────────────────────────────────────────────────────────────────────
+# WHAT IS THIS FILE?
+# This file is the conductor. It describes every service our app needs:
+#   - web   → the React frontend
+#   - api   → the Node.js backend
+#   - db    → the PostgreSQL database
+#
+# One command starts all three: docker compose up
+# One command stops all three: docker compose down
+# ─────────────────────────────────────────────────────────────────────────────
+
+# The version of docker-compose syntax we are using
+services:
+
+  # ── React Frontend ──────────────────────────────────────────────────────────
+  web:
+    # "build" tells Docker: build a container using this Dockerfile
+    build:
+      context: .    # the folder to look in for the Dockerfile, # ← was ./apps/web, now the ROOT
+      dockerfile: apps/web/Dockerfile # the filename (Dockerfile is the default, but explicit is clear), # ← tell Docker where the Dockerfile is
+
+    # Map ports: "your_machine:inside_container"
+    # So localhost:5173 on your machine connects to port 5173 inside the container
+    ports:
+      - "5173:5173"
+
+    # Volumes sync files between your machine and the container in real time.
+    # When you save a file on your laptop, the change instantly appears inside
+    # the container — your hot reload still works.
+    volumes:
+      # Sync web source files into the correct path inside the container
+      - ./apps/web:/app/apps/web
+
+      # This line is critical and confusing at first.
+      # Without it, the local empty node_modules folder would overwrite
+      # the node_modules that were installed INSIDE the container.
+      # This tells Docker: "keep the container's node_modules — do not sync mine."
+      - /app/node_modules
+      - /app/apps/web/node_modules
+
+    # Environment variables passed into the container.
+    # VITE_ prefix is required — Vite only exposes variables with this prefix
+    # to the browser for security reasons.
+    environment:
+      - VITE_API_URL=http://localhost:4000
+
+    # depends_on means: "do not start web until api has started"
+    # This prevents the React app from starting before the API is ready.
+    depends_on:
+      - api
+
+    # Which network this service joins.
+    # Services on the same network can talk to each other by service name.
+    networks:
+      - devflow-network
+
+  # ── Node.js API BACKEND ─────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: . # ← was ./apps/api, now the ROOT
+      dockerfile: apps/api/Dockerfile   # ← tell Docker where the Dockerfile is
+
+    ports:
+      - "4000:4000"
+      - "5555:5555" # maps Prisma Studio to your machine
+
+    volumes:
+      # Sync api source files into the correct path inside the container
+      - ./apps/api:/app/apps/api
+      # Protect the node_modules that were installed inside the container
+      - /app/node_modules
+      - /app/apps/api/node_modules
+
+    # env_file loads all variables from .env into the container.
+    # This is how process.env.JWT_SECRET etc. become available inside the API.
+    env_file:
+      - ./apps/api/.env
+
+    # depends_on with a condition:
+    # Do not start the API until the database passes its health check.
+    # Without this, the API might try to connect to the database before
+    # Postgres has finished starting — causing a crash.
+    depends_on:
+      db:
+        condition: service_healthy
+
+    networks:
+      - devflow-network
+
+  # ── PostgreSQL Database ──────────────────────────────────────────────────────
+  db:
+    # We use the official PostgreSQL image — no Dockerfile needed.
+    # "16-alpine" is Postgres version 16 on Alpine Linux (small and fast).
+    image: postgres:16-alpine
+
+    # Expose port 5432 so you can connect from a database GUI on your laptop
+    # like TablePlus, DBeaver, or pgAdmin.
+    ports:
+      - "5432:5432"
+
+    # These environment variables configure the Postgres database on first start.
+    environment:
+      POSTGRES_USER: devflow          # the database username
+      POSTGRES_PASSWORD: devflow_secret  # the database password
+      POSTGRES_DB: devflow            # the name of the database to create
+
+    # Named volume — this is where your actual data lives.
+    # When you stop and restart Docker, your data is still there.
+    # If you used a regular folder sync instead, data would be lost on restart.
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    # Health check — Docker runs this command every 5 seconds.
+    # Until it passes, the container is considered "unhealthy".
+    # The API's depends_on waits for this to pass before starting.
+    # pg_isready checks if Postgres is accepting connections.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devflow -d devflow"]
+      interval: 5s    # check every 5 seconds
+      timeout: 5s     # give it 5 seconds to respond
+      retries: 5      # try 5 times before giving up
+
+    networks:
+      - devflow-network
+
+# ── Named Volumes ──────────────────────────────────────────────────────────────
+# We declare the postgres_data volume here so Docker manages it.
+# Data in this volume survives container restarts and even "docker compose down".
+# To completely wipe the database: docker compose down -v
+volumes:
+  postgres_data:
+
+# ── Networks ───────────────────────────────────────────────────────────────────
+# A custom network so our containers can talk to each other by service name.
+# Inside the api container, you can reach the database at hostname "db"
+# (the service name above) — that is why DATABASE_URL uses "@db:5432" not "@localhost:5432"
+networks:
+  devflow-network:
+    driver: bridge

@@ -1,0 +1,32 @@
+# Never copy these into Docker — they are huge and regenerated inside the container
+node_modules
+**/node_modules
+
+# Git history is not needed inside a container
+.git
+.gitignore
+
+# Build output is regenerated
+dist
+build
+**/dist
+**/build
+
+# Environment files — secrets must not be baked into images
+.env
+**/.env
+
+# Logs
+*.log
+**/logs
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode
+.idea
+
+# TypeScript build cache
+*.tsbuildinfo

@@ -25,17 +25,17 @@ import cors from 'cors'
 // Without this, req.cookies would be undefined.
 import cookieParser from 'cookie-parser'
 
-// PrismaClient is the database connection.
-// We create ONE instance and export it so every route file can use it.
 import { PrismaClient } from '@prisma/client'
 
-// ── Create the Prisma database client ────────────────────────────────────────
-// Think of prisma as the translator between our TypeScript code and the database.
-// We export it so other files can import it: import { prisma } from '../index'
+// Create the Prisma database client.
+// We export this so any route file can import it:
+//   import { prisma } from '../index'
 export const prisma = new PrismaClient({
-  // log what database queries run during development — helpful for debugging
-  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  // In development, log every SQL query so we can see what's happening.
+  // In production, only log errors — too much logging slows things down.
+  log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
 })
+
 
 // ── Create the Express app ────────────────────────────────────────────────────
 // app is the main Express instance. We attach all middleware and routes to it.
