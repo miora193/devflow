@@ -1,0 +1,14 @@
+{
+    "name": "devflow",
+    "private": true,
+    "engines": {
+        "node": ">=20",
+        "pnpm": ">=8"
+    },
+    "scripts": {
+        "dev": "pnpm --parallel -r dev",
+        "build": "pnpm -r build",
+        "lint": "pnpm -r lint",
+        "typecheck": "pnpm -r typecheck"
+    }
+}
