@@ -27,6 +27,9 @@ import cookieParser from 'cookie-parser'
 
 import { PrismaClient } from '@prisma/client'
 
+// Import the auth router we just created
+import authRoutes from './routes/auth'
+
 // Create the Prisma database client.
 // We export this so any route file can import it:
 //   import { prisma } from '../index'
@@ -65,6 +68,14 @@ app.use(cors({
   // Without this, the browser refuses to send our auth_token cookie.
   credentials: true,
 }))
+
+// Register auth routes under the /auth prefix.
+// This means:
+//   router.get('/github')          → GET /auth/github
+//   router.get('/github/callback') → GET /auth/github/callback
+//   router.get('/me')              → GET /auth/me
+//   router.post('/logout')         → POST /auth/logout
+app.use('/auth', authRoutes)
 
 // ── Health check route ────────────────────────────────────────────────────────
 // This is the simplest possible route — it just says "yes, I am alive."
