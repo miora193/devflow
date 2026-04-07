@@ -25,10 +25,10 @@ PHASE 1 IN PROGRESS — Foundation & Authentication
 - [x] Step 7: React web app scaffold
 - [x] Step 8: Docker setup — all 3 containers running
 - [x] Step 9: Prisma schema + first migration
-- [ ] Step 10: GitHub OAuth backend
-- [ ] Step 11: React auth layer (context, hooks, protected routes)
-- [ ] Step 12: End-to-end login test
-- [ ] Step 13: Commit and merge Phase 1 to main
+- [x] Step 10: GitHub OAuth backend
+- [x] Step 11: React auth layer (context, hooks, protected routes)
+- [x] Step 12: End-to-end login test
+- [x] Step 13: Commit and merge Phase 1 to main
 
 ## Tech stack
 Frontend  : React 19, TypeScript, Vite 6, Tailwind CSS, TanStack Query v5, Zustand
