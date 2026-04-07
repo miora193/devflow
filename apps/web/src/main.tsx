@@ -23,6 +23,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 // React Query caches, their status, and when they last fetched.
 // It is automatically excluded from production builds.
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { AuthProvider } from '@/context/AuthContext'
 
 import App from './App'
 
@@ -71,11 +72,11 @@ createRoot(rootElement).render(
       {/* QueryClientProvider shares the queryClient with every component */}
       <QueryClientProvider client={queryClient}>
 
-        {/* Your entire app lives here */}
-        <App />
-
-        {/* React Query DevTools panel — only visible in development */}
-        <ReactQueryDevtools initialIsOpen={false} />
+        {/* AuthProvider wraps everything so every component can call useAuth() */}
+        <AuthProvider>
+          <App />
+          <ReactQueryDevtools initialIsOpen={false} />
+        </AuthProvider>
 
       </QueryClientProvider>
     </BrowserRouter>
