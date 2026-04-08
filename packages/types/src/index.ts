@@ -85,3 +85,106 @@ export interface ApiError {
   message: string     // human-readable explanation — e.g. "Please log in first"
   statusCode: number  // HTTP status code — 401, 403, 404, 500, etc.
 }
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PHASE 2 — GitHub Data Types
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Repository ────────────────────────────────────────────────────────────────
+// A GitHub repository a workspace has connected to DevFlow.
+export interface Repository {
+  id:            string
+  // GitHub's own numeric ID — never changes even if the repo is renamed
+  githubId:      number
+  // Full name includes owner: "myorg/myrepo"
+  fullName:      string
+  // Just the repo name: "myrepo"
+  name:          string
+  // The owner — a user or organisation
+  owner:         string
+  isPrivate:     boolean
+  // Usually "main" or "master"
+  defaultBranch: string
+  workspaceId:   string
+  // null means we have never synced this repo yet
+  lastSyncedAt:  string | null
+  createdAt:     string
+}
+
+// ── PullRequest ───────────────────────────────────────────────────────────────
+// One pull request from a connected repository.
+// We store a local copy so we can query it without calling GitHub every time.
+export interface PullRequest {
+  id:              string
+  // GitHub's PR number — e.g. #42 — shown in the GitHub URL
+  githubNumber:    number
+  title:           string
+  // open = in review | closed = closed without merging | merged = merged
+  state:           'open' | 'closed' | 'merged'
+  authorUsername:  string
+  authorAvatarUrl: string
+  // The branch the PR is merging INTO — usually "main"
+  baseBranch:      string
+  // The branch the PR is coming FROM — the feature branch
+  headBranch:      string
+  githubUrl:       string
+  // Counts stored locally so we do not re-fetch constantly
+  commentsCount:   number
+  reviewsCount:    number
+  changedFiles:    number
+  additions:       number  // lines added (green in diff)
+  deletions:       number  // lines removed (red in diff)
+  // Timestamps from GitHub
+  githubCreatedAt: string
+  githubUpdatedAt: string
+  githubMergedAt:  string | null  // null if not merged
+  githubClosedAt:  string | null  // null if still open
+  repositoryId:    string
+  createdAt:       string
+  updatedAt:       string
+}
+
+// ── Review ────────────────────────────────────────────────────────────────────
+// A review left on a pull request.
+export type ReviewState =
+  | 'APPROVED'           // reviewer approved the changes
+  | 'CHANGES_REQUESTED'  // reviewer asked for changes
+  | 'COMMENTED'          // reviewer commented without approving or rejecting
+  | 'DISMISSED'          // a previous review was dismissed by an admin
+
+export interface Review {
+  id:                  string
+  githubId:            number
+  state:               ReviewState
+  reviewerUsername:    string
+  reviewerAvatarUrl:   string
+  body:                string
+  githubSubmittedAt:   string
+  pullRequestId:       string
+  createdAt:           string
+}
+
+// ── BullMQ Job Payloads ───────────────────────────────────────────────────────
+// These describe the data we put INTO the queue.
+// The worker reads these to know what to do.
+
+// Sync ALL pull requests for a repository (used on first connect)
+export interface SyncRepoJobData {
+  repositoryId: string
+  workspaceId:  string
+  // "owner/repo" format — used to call GitHub API
+  fullName:     string
+  // GitHub access token to authenticate the API call
+  accessToken:  string
+}
+
+// Sync ONE pull request (used when a webhook fires for a single PR)
+export interface SyncPRJobData {
+  repositoryId: string
+  workspaceId:  string
+  fullName:     string
+  // GitHub PR number e.g. 42
+  prNumber:     number
+  accessToken:  string
+}

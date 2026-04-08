@@ -28,8 +28,8 @@ PHASE 2 IN PROGRESS — GitHub Data Pipeline
 - Merged to main — tagged v0.1.0
 
 ## Phase 2 checklist
-- [ ] Step 1: Install new dependencies (BullMQ, Redis, Octokit)
-- [ ] Step 2: Add Redis to Docker
+- [x] Step 1: Install new dependencies (BullMQ, Redis, Octokit)
+- [x] Step 2: Add Redis to Docker
 - [ ] Step 3: Prisma schema update — Repository, PullRequest, Review
 - [ ] Step 4: GitHub App registration + webhook secret
 - [ ] Step 5: Webhook endpoint — receives GitHub events
@@ -97,7 +97,7 @@ docker compose exec api sh -c "cd /app/apps/api && npx prisma migrate dev --name
 - Push to GitHub immediately — that is your backup
 
 ## Key decisions and why
-- pnpm workspaces : share TypeScript types between frontend and backend
+- pnpm workspaces  : share TypeScript types between frontend and backend
 - httpOnly cookies : safer than localStorage — JS cannot read them
 - React Query      : handles server state, caching, background refetch
 - Zustand          : handles client-only UI state (sidebar open, theme)
@@ -114,9 +114,9 @@ Phase 5 : AI review assistant (streaming SSE, OpenAI)
 Phase 6 : Production hardening (CI/CD, tests, monitoring)
 
 ## Notes for Claude
-- Explain every concept in simple language before showing code
+- Explain every concept in simple language/ baby way before showing code
 - Add comments to every line of code that is not obvious
 - Wait for confirmation that each step worked before moving on
-- This is production level — security, error handling, clean architecture
-- One step at a time — never give multiple steps at once without confirmation
+- This is production level - security, error handling, clean architecture
+- One step at a time - never give multiple steps at once without confirmation
 - Commit instructions included at the end of every step
