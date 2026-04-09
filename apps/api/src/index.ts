@@ -38,6 +38,9 @@ import webhookRoutes from './routes/webhooks'
 // It runs alongside the Express server in the same Node.js process.
 import './workers/sync.worker'
 
+import repoRoutes    from './routes/repos' 
+
+
 // Create the Prisma database client.
 // We export this so any route file can import it:
 //   import { prisma } from '../index'
@@ -126,6 +129,9 @@ app.listen(PORT, () => {
   └─────────────────────────────────────┘
   `)
 })
+
+// ...after the other app.use() lines:
+app.use('/repos', repoRoutes)
 
 // Export app for testing purposes — test files can import the app
 // without starting the server
