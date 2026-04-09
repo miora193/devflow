@@ -30,6 +30,9 @@ import { PrismaClient } from '@prisma/client'
 // Import the auth router we just created
 import authRoutes from './routes/auth'
 
+// Import the webhook router
+import webhookRoutes from './routes/webhooks'
+
 // Create the Prisma database client.
 // We export this so any route file can import it:
 //   import { prisma } from '../index'
@@ -76,6 +79,12 @@ app.use(cors({
 //   router.get('/me')              → GET /auth/me
 //   router.post('/logout')         → POST /auth/logout
 app.use('/auth', authRoutes)
+
+
+// Webhook routes — /webhooks/github
+// GitHub sends events here when PRs are opened, updated, merged
+app.use('/webhooks', webhookRoutes)
+
 
 // ── Health check route ────────────────────────────────────────────────────────
 // This is the simplest possible route — it just says "yes, I am alive."

@@ -30,10 +30,10 @@ PHASE 2 IN PROGRESS — GitHub Data Pipeline
 ## Phase 2 checklist
 - [x] Step 1: Install new dependencies (BullMQ, Redis, Octokit)
 - [x] Step 2: Add Redis to Docker
-- [ ] Step 3: Prisma schema update — Repository, PullRequest, Review
-- [ ] Step 4: GitHub App registration + webhook secret
-- [ ] Step 5: Webhook endpoint — receives GitHub events
-- [ ] Step 6: BullMQ queue setup
+- [x] Step 3: Prisma schema update — Repository, PullRequest, Review
+- [x] Step 4: GitHub App registration + webhook secret
+- [x] Step 5: Webhook endpoint — receives GitHub events
+- [x] Step 6: BullMQ queue setup
 - [ ] Step 7: Sync worker — processes jobs from the queue
 - [ ] Step 8: Manual sync trigger endpoint
 - [ ] Step 9: PR list API endpoint
