@@ -2,9 +2,11 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # WHAT IS THIS FILE?
 # This file is the conductor. It describes every service our app needs:
-#   - web   → the React frontend
-#   - api   → the Node.js backend
-#   - db    → the PostgreSQL database
+#   - web   → the React frontend (port 5173)
+#   - api   → the Node.js backend (port 4000)
+#   - db    → the PostgreSQL database (port 5432)
+#   - redis → Redis queue storage (port 6379)
+
 #
 # One command starts all three: docker compose up
 # One command stops all three: docker compose down
@@ -123,13 +125,43 @@ services:
 
     networks:
       - devflow-network
+  
+  # ── Redis ────────────────────────────────────────────────────────────────────
+  # Redis is the storage engine for BullMQ (our job queue).
+  # BullMQ writes jobs to Redis. The sync worker reads jobs from Redis.
+  # Think of Redis as the whiteboard where the to-do list lives.
+  redis:
+   # Official Redis image — lightweight Alpine version
+    image: redis:7-alpine
+    ports:
+      # Port 6379 is Redis's default port
+      # Expose it so you can connect with a Redis GUI tool if needed
+      - "6379:6379"
+    volumes:
+      # Named volume so queue data survives restarts
+      # Without this, all queued jobs would be lost if Redis restarts
+      - redis_data:/data
+    # --appendonly yes means Redis saves data to disk periodically
+    # Without this, Redis only keeps data in RAM — a restart loses everything
+    # With this, Redis recovers its state after a restart
+    command: redis-server --appendonly yes
+    healthcheck:
+      # "redis-cli ping" returns "PONG" when Redis is ready
+      # Docker waits for this before starting the API
+      test:     ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout:  3s
+      retries:  5
+    networks:
+      - devflow-network
 
 # ── Named Volumes ──────────────────────────────────────────────────────────────
 # We declare the postgres_data volume here so Docker manages it.
 # Data in this volume survives container restarts and even "docker compose down".
 # To completely wipe the database: docker compose down -v
 volumes:
-  postgres_data:
+  postgres_data:  # PostgreSQL data
+  redis_data:     # Redis queue data — NEW in Phase 2
 
 # ── Networks ───────────────────────────────────────────────────────────────────
 # A custom network so our containers can talk to each other by service name.

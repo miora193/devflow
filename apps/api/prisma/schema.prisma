@@ -1,73 +1,284 @@
 // schema.prisma
 // ─────────────────────────────────────────────────────────────────────────────
-// WHAT IS THIS FILE?
-// This file describes your database in plain language.
-// Prisma reads it and does two things:
-//   1. Creates the actual tables in PostgreSQL (via "prisma migrate")
-//   2. Generates TypeScript code you use to query the database (via "prisma generate")
+// This file describes every table in our database.
+// Prisma reads it and:
+//   1. Creates/updates real tables in PostgreSQL (via "prisma migrate")
+//   2. Generates TypeScript code we use to query those tables (via "prisma generate")
 //
-// Think of it as a blueprint. The blueprint describes rooms.
-// Prisma is the construction crew that builds them.
+// Think of it as a blueprint for our database.
 // ─────────────────────────────────────────────────────────────────────────────
 
 generator client {
-  provider      = "prisma-client-js"
+  provider = "prisma-client-js"
 
-  // "native" = detect the current platform automatically.
-  // On Debian slim (our Docker container), this resolves to
-  // "debian-openssl-3.0.x" which works correctly.
-  // On your local machine it resolves to whatever your OS needs.
+  // binaryTargets tells Prisma which engine binary to download.
+  // "native"                  = your local machine (Mac/Linux/Windows)
+  // "debian-openssl-3.0.x"   = our Docker container (Debian slim with OpenSSL 3)
+  // We need both so Prisma works both locally AND inside Docker.
   binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
+  // We are using PostgreSQL
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+
+  // env("DATABASE_URL") reads the DATABASE_URL value from our .env file
+  // So the actual connection string never lives in this committed file
+  url = env("DATABASE_URL")
 }
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PHASE 1 MODELS
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── User ──────────────────────────────────────────────────────────────────────
+// Every person who logs in via GitHub becomes a User in our database.
 model User {
+  // @id           = this is the primary key (unique identifier for each row)
+  // @default(cuid()) = Postgres auto-generates a unique ID like "clx7abc123"
+  //                    cuid is safer than 1,2,3 because it cannot be guessed
   id        String   @id @default(cuid())
+
+  // @unique = no two users can have the same githubId
+  // This is GitHub's own ID — it never changes even if they rename their account
   githubId  String   @unique
+
+  // @unique = no two users can have the same username
   username  String   @unique
+
   email     String
   avatarUrl String
+
+  // @default(now()) = automatically set to current time when the row is created
   createdAt DateTime @default(now())
+
+  // @updatedAt = automatically updates every time this row changes
   updatedAt DateTime @updatedAt
 
-  ownedWorkspaces  Workspace[]
-  memberships      WorkspaceMember[]
+  // These are "relations" — virtual links to other tables.
+  // They do NOT create columns — they tell Prisma how tables connect.
+  ownedWorkspaces Workspace[]
+  memberships     WorkspaceMember[]
 }
 
+
+// ── Workspace ─────────────────────────────────────────────────────────────────
+// A workspace is like a team. One user can belong to many workspaces.
 model Workspace {
   id        String   @id @default(cuid())
   name      String
+
+  // slug is the URL-safe version of the name
+  // e.g. "MIORA Store Team" becomes "miora-store-team"
   slug      String   @unique
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Foreign key — stores the id of the User who owns this workspace
   ownerId   String
+
+  // This tells Prisma: ownerId links to the id field on the User model
+  // onDelete: Cascade = if the User is deleted, delete their workspaces too
   owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
-  members   WorkspaceMember[]
+  // Relations to other tables
+  members      WorkspaceMember[]
+  repositories Repository[]      // ← NEW: a workspace can have many repos
 }
 
-model WorkspaceMember {
-  id          String   @id @default(cuid())
-  joinedAt    DateTime @default(now())
-  role        Role     @default(member)
 
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+// ── WorkspaceMember ───────────────────────────────────────────────────────────
+// Connects a User to a Workspace with a specific Role.
+// This is called a "junction table" — it sits between User and Workspace.
+model WorkspaceMember {
+  id       String   @id @default(cuid())
+  joinedAt DateTime @default(now())
+
+  // Role determines what this user can do in this workspace
+  // Must be one of the values defined in the Role enum below
+  role     Role     @default(member)
+
+  userId   String
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
+  // @@unique = the COMBINATION of userId + workspaceId must be unique
+  // This prevents adding the same user to the same workspace twice
   @@unique([userId, workspaceId])
 }
 
+
+// ── Role enum ─────────────────────────────────────────────────────────────────
+// An enum is a fixed list of allowed values.
+// The role column can ONLY be one of these four values.
+// Postgres enforces this — if you try to save "superuser" it will reject it.
 enum Role {
-  owner
-  admin
-  member
-  viewer
+  owner   // created the workspace, full control
+  admin   // can manage members and settings
+  member  // can view and interact with data
+  viewer  // read-only, cannot change anything
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PHASE 2 MODELS — new tables for GitHub data
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Repository ────────────────────────────────────────────────────────────────
+// A GitHub repository that a workspace has connected to DevFlow.
+// When a user connects "myorg/myrepo", we create one of these records.
+model Repository {
+  id        String   @id @default(cuid())
+
+  // GitHub's own numeric ID for this repo
+  // We store this because GitHub uses it in webhook payloads
+  githubId  Int      @unique
+
+  // Full name includes owner: "myorg/myrepo"
+  // We use this to call the GitHub API: GET /repos/myorg/myrepo/pulls
+  fullName  String   @unique
+
+  // Just the repo name without owner: "myrepo"
+  name      String
+
+  // The owner — could be a user or an organisation: "myorg"
+  owner     String
+
+  // Whether this is a private repo on GitHub
+  isPrivate Boolean  @default(false)
+
+  // The default branch — usually "main" or "master"
+  defaultBranch String @default("main")
+
+  // When we last successfully synced PR data from GitHub
+  // null means we have never synced this repo yet
+  lastSyncedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Which workspace this repo belongs to
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  // One repository has many pull requests
+  pullRequests PullRequest[]
+
+  // Index on workspaceId — speeds up queries like "give me all repos for workspace X"
+  // Without an index, Postgres scans the entire table every time
+  @@index([workspaceId])
+}
+
+
+// ── PullRequest ───────────────────────────────────────────────────────────────
+// One pull request from a connected repository.
+// We store a local copy so we can query it without calling GitHub every time.
+// GitHub is the source of truth — we sync from it regularly.
+model PullRequest {
+  id        String @id @default(cuid())
+
+  // GitHub's number for this PR — e.g. #42
+  // This is shown in the GitHub URL: github.com/org/repo/pull/42
+  githubNumber Int
+
+  title  String
+
+  // The current state of the PR
+  // We use a String here (not an enum) because GitHub might add new states
+  // and we do not want our app to break if that happens
+  // Possible values: "open", "closed", "merged"
+  state  String @default("open")
+
+  // Who opened the PR — stored as strings so we do not need a User record
+  // for every GitHub contributor (they may not be DevFlow users)
+  authorUsername  String
+  authorAvatarUrl String
+
+  // Which branch this PR is trying to merge INTO — usually "main"
+  baseBranch String
+
+  // Which branch this PR is coming FROM — the feature branch
+  headBranch String
+
+  // Direct link to this PR on GitHub — useful for the frontend
+  githubUrl String
+
+  // These counts are stored locally so the dashboard loads fast
+  // without needing to re-fetch from GitHub every time
+  commentsCount Int @default(0)
+  reviewsCount  Int @default(0)
+  changedFiles  Int @default(0)
+  additions     Int @default(0)  // lines added (green in the diff)
+  deletions     Int @default(0)  // lines removed (red in the diff)
+
+  // Timestamps from GitHub — we store them as-is
+  githubCreatedAt DateTime
+  githubUpdatedAt DateTime
+  githubMergedAt  DateTime?  // null if not merged yet
+  githubClosedAt  DateTime?  // null if still open
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Which repository this PR belongs to
+  repositoryId String
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
+  // One PR has many reviews
+  reviews Review[]
+
+  // @@unique = the combination of repositoryId + githubNumber must be unique
+  // PR #42 can only exist once per repository — no duplicates
+  @@unique([repositoryId, githubNumber])
+
+  // Indexes speed up common queries
+  @@index([repositoryId])  // "give me all PRs for this repo"
+  @@index([state])         // "give me all open PRs"
+  @@index([authorUsername]) // "give me all PRs by this author"
+}
+
+
+// ── Review ────────────────────────────────────────────────────────────────────
+// A review left on a pull request.
+// GitHub has four review states — see the ReviewState enum below.
+model Review {
+  id       String @id @default(cuid())
+
+  // GitHub's own ID for this review
+  githubId Int    @unique
+
+  // The review state — must be one of the values in ReviewState enum
+  state    ReviewState
+
+  // Who left the review
+  reviewerUsername  String
+  reviewerAvatarUrl String
+
+  // The review comment — can be empty string for APPROVED reviews
+  body String @default("")
+
+  // When the review was submitted on GitHub
+  githubSubmittedAt DateTime
+
+  createdAt DateTime @default(now())
+
+  // Which PR this review belongs to
+  pullRequestId String
+  pullRequest   PullRequest @relation(fields: [pullRequestId], references: [id], onDelete: Cascade)
+
+  @@index([pullRequestId]) // "give me all reviews for this PR"
+}
+
+
+// ── ReviewState enum ──────────────────────────────────────────────────────────
+// The four states a GitHub review can have.
+enum ReviewState {
+  APPROVED           // reviewer approved — ready to merge
+  CHANGES_REQUESTED  // reviewer wants changes before merging
+  COMMENTED          // reviewer left comments without approving or rejecting
+  DISMISSED          // a previous review was dismissed by a repo admin
 }

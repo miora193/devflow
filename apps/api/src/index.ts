@@ -30,6 +30,17 @@ import { PrismaClient } from '@prisma/client'
 // Import the auth router we just created
 import authRoutes from './routes/auth'
 
+// Import the webhook router
+import webhookRoutes from './routes/webhooks'
+
+// Import the sync worker — this starts it running in the background.
+// The worker listens on the BullMQ queue and processes jobs automatically.
+// It runs alongside the Express server in the same Node.js process.
+import './workers/sync.worker'
+
+import repoRoutes    from './routes/repos' 
+
+
 // Create the Prisma database client.
 // We export this so any route file can import it:
 //   import { prisma } from '../index'
@@ -77,6 +88,13 @@ app.use(cors({
 //   router.post('/logout')         → POST /auth/logout
 app.use('/auth', authRoutes)
 
+
+// Webhook routes — /webhooks/github
+// GitHub sends events here when PRs are opened, updated, merged
+app.use('/webhooks', webhookRoutes)
+
+
+
 // ── Health check route ────────────────────────────────────────────────────────
 // This is the simplest possible route — it just says "yes, I am alive."
 // Docker uses this to know the container is healthy.
@@ -111,6 +129,9 @@ app.listen(PORT, () => {
   └─────────────────────────────────────┘
   `)
 })
+
+// ...after the other app.use() lines:
+app.use('/repos', repoRoutes)
 
 // Export app for testing purposes — test files can import the app
 // without starting the server
