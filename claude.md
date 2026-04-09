@@ -37,8 +37,8 @@ PHASE 2 IN PROGRESS — GitHub Data Pipeline
 - [x] Step 7: Sync worker — processes jobs from the queue
 - [x] Step 8: Manual sync trigger endpoint
 - [x] Step 9: PR list API endpoint
-- [ ] Step 10: React PR list page with infinite scroll
-- [ ] Step 11: Commit and merge Phase 2 to main
+- [x] Step 10: React PR list page with infinite scroll
+- [x] Step 11: Commit and merge Phase 2 to main
 
 ## Tech stack
 Frontend  : React 19, TypeScript, Vite 6, Tailwind CSS, TanStack Query v5, Zustand

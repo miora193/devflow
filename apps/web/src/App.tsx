@@ -5,6 +5,9 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import LoginPage from '@/pages/LoginPage'
 import DashboardPage from '@/pages/DashboardPage'
+import RepositoriesPage from '@/pages/RepositoriesPage'
+import PullRequestsPage from '@/pages/PullRequestsPage'
+
 
 export default function App() {
   return (
@@ -14,18 +17,25 @@ export default function App() {
 
       {/* Protected route — only logged-in users can see the dashboard.
           ProtectedRoute checks authentication and redirects to /login if needed. */}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <DashboardPage />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/dashboard" element={
+        <ProtectedRoute><DashboardPage /></ProtectedRoute>
+      } />
 
-      {/* Catch-all: any unknown URL redirects to /dashboard.
-          ProtectedRoute handles sending unauthenticated users to /login. */}
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/repos" element={
+        <ProtectedRoute>
+          <RepositoriesPage />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/repos/:id/pulls" element={
+        <ProtectedRoute>
+          <PullRequestsPage />
+        </ProtectedRoute>
+      } />
+
+      {/* Redirect root to repos page */}
+      <Route path="/" element={<Navigate to="/repos" replace />} />
+      <Route path="*" element={<Navigate to="/repos" replace />} />
     </Routes>
   )
 }

@@ -158,11 +158,12 @@ router.post('/connect', async (req: Request, res: Response) => {
     })
   }
 
-  // Check if this repo is already connected to this workspace
+  // Check if this repo is already connected
+  // We check both fullName and githubId to catch all duplicate cases
   const existing = await prisma.repository.findFirst({
     where: {
-      fullName:    `${owner}/${repo}`,
       workspaceId: workspace.id,
+      fullName: `${owner}/${repo}`,
     },
   })
 
@@ -195,21 +196,31 @@ router.post('/connect', async (req: Request, res: Response) => {
     throw error
   }
 
-  // ── Save the repository to our database ──────────────────────────────────
-  const repository = await prisma.repository.create({
-    data: {
-      // GitHub's numeric ID for this repo
-      githubId:      githubRepo.id,
-      fullName:      githubRepo.full_name,
-      name:          githubRepo.name,
-      owner:         githubRepo.owner.login,
-      isPrivate:     githubRepo.private,
-      defaultBranch: githubRepo.default_branch,
-      workspaceId:   workspace.id,
-      // lastSyncedAt is null — we have not synced yet
-    },
-  })
-
+// ── Save the repository to our database ──────────────────────────────────
+  let repository
+  try {
+    repository = await prisma.repository.create({
+      data: {
+        githubId:      githubRepo.id,
+        fullName:      githubRepo.full_name,
+        name:          githubRepo.name,
+        owner:         githubRepo.owner.login,
+        isPrivate:     githubRepo.private,
+        defaultBranch: githubRepo.default_branch,
+        workspaceId:   workspace.id,
+      },
+    })
+  } catch (error: any) {
+    // P2002 = unique constraint violation
+    // This means the repo is already connected (caught by githubId uniqueness)
+    if (error.code === 'P2002') {
+      return res.status(409).json({
+        error:   'ALREADY_CONNECTED',
+        message: `${owner}/${repo} is already connected to this workspace`,
+      })
+    }
+    throw error
+  }
   // ── Queue a full sync job ─────────────────────────────────────────────────
   // This fetches all existing PRs for this repo.
   // The job runs in the background — we do not wait for it here.
