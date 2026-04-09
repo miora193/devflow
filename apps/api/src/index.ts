@@ -33,6 +33,11 @@ import authRoutes from './routes/auth'
 // Import the webhook router
 import webhookRoutes from './routes/webhooks'
 
+// Import the sync worker — this starts it running in the background.
+// The worker listens on the BullMQ queue and processes jobs automatically.
+// It runs alongside the Express server in the same Node.js process.
+import './workers/sync.worker'
+
 // Create the Prisma database client.
 // We export this so any route file can import it:
 //   import { prisma } from '../index'
@@ -84,6 +89,7 @@ app.use('/auth', authRoutes)
 // Webhook routes — /webhooks/github
 // GitHub sends events here when PRs are opened, updated, merged
 app.use('/webhooks', webhookRoutes)
+
 
 
 // ── Health check route ────────────────────────────────────────────────────────

@@ -34,7 +34,7 @@ PHASE 2 IN PROGRESS — GitHub Data Pipeline
 - [x] Step 4: GitHub App registration + webhook secret
 - [x] Step 5: Webhook endpoint — receives GitHub events
 - [x] Step 6: BullMQ queue setup
-- [ ] Step 7: Sync worker — processes jobs from the queue
+- [x] Step 7: Sync worker — processes jobs from the queue
 - [ ] Step 8: Manual sync trigger endpoint
 - [ ] Step 9: PR list API endpoint
 - [ ] Step 10: React PR list page with infinite scroll
