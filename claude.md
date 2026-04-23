@@ -15,7 +15,7 @@ Needs every concept explained simply with comments in code.
 Production-level quality throughout.
 
 ## Current status
-PHASE 2 IN PROGRESS — GitHub Data Pipeline
+PHASE 3 IN PROGRESS — Analytics & Charts
 
 ## Phase 1 — COMPLETE ✓
 - pnpm monorepo with shared TypeScript types
@@ -27,21 +27,31 @@ PHASE 2 IN PROGRESS — GitHub Data Pipeline
 - End-to-end login flow working
 - Merged to main — tagged v0.1.0
 
-## Phase 2 checklist
-- [x] Step 1: Install new dependencies (BullMQ, Redis, Octokit)
-- [x] Step 2: Add Redis to Docker
-- [x] Step 3: Prisma schema update — Repository, PullRequest, Review
-- [x] Step 4: GitHub App registration + webhook secret
-- [x] Step 5: Webhook endpoint — receives GitHub events
-- [x] Step 6: BullMQ queue setup
-- [x] Step 7: Sync worker — processes jobs from the queue
-- [x] Step 8: Manual sync trigger endpoint
-- [x] Step 9: PR list API endpoint
-- [x] Step 10: React PR list page with infinite scroll
-- [x] Step 11: Commit and merge Phase 2 to main
+## Phase 2 — COMPLETE ✓
+- Redis in Docker for BullMQ queue storage
+- Prisma schema — Repository, PullRequest, Review models
+- GitHub webhook endpoint with HMAC signature verification
+- BullMQ queue with exponential backoff retry
+- Sync worker — fetches PRs and reviews from GitHub API
+- Repo connect + manual sync endpoints
+- PR list API with pagination and state filtering
+- React repositories page and PR list page
+- Merged to main — tagged v0.2.0
+
+## Phase 3 checklist
+- [x] Step 1: Understand what Phase 3 builds
+- [x] Step 2: Install chart dependencies (Recharts, D3, date-fns)
+- [ ] Step 3: Analytics API endpoints (cycle time, velocity, review stats)
+- [ ] Step 4: Analytics React Query hooks
+- [ ] Step 5: PR cycle time chart (D3 scatter plot)
+- [ ] Step 6: Team velocity chart (Recharts area chart)
+- [ ] Step 7: Review depth chart (Recharts bar chart)
+- [ ] Step 8: PR heatmap (D3 calendar heatmap)
+- [ ] Step 9: Analytics dashboard page
+- [ ] Step 10: Commit and merge Phase 3 to main
 
 ## Tech stack
-Frontend  : React 19, TypeScript, Vite 6, Tailwind CSS, TanStack Query v5, Zustand
+Frontend  : React 19, TypeScript, Vite 6, TanStack Query v5, Zustand, Recharts, D3
 Backend   : Node.js, Express, TypeScript
 Database  : PostgreSQL 16 via Prisma ORM
 Queue     : BullMQ + Redis
@@ -52,26 +62,45 @@ Infra     : Docker, docker-compose, pnpm monorepo
 devflow/
 ├── apps/
 │   ├── web/                    React frontend — port 5173
+│   │   └── src/
+│   │       ├── main.tsx
+│   │       ├── App.tsx
+│   │       ├── context/AuthContext.tsx
+│   │       ├── components/ProtectedRoute.tsx
+│   │       ├── hooks/
+│   │       │   ├── useRepos.ts         Phase 2
+│   │       │   └── useAnalytics.ts     Phase 3 — coming
+│   │       ├── lib/api.ts
+│   │       └── pages/
+│   │           ├── LoginPage.tsx
+│   │           ├── DashboardPage.tsx
+│   │           ├── RepositoriesPage.tsx
+│   │           ├── PullRequestsPage.tsx
+│   │           └── AnalyticsPage.tsx   Phase 3 — coming
 │   └── api/                    Express backend — port 4000
-│       ├── src/
-│       │   ├── index.ts
-│       │   ├── routes/
-│       │   │   ├── auth.ts     Phase 1 — done
-│       │   │   ├── repos.ts    Phase 2 — sync trigger + PR list
-│       │   │   └── webhooks.ts Phase 2 — receives GitHub events
-│       │   ├── queues/         Phase 2 — BullMQ queue definitions
-│       │   ├── workers/        Phase 2 — sync worker
-│       │   └── lib/            Phase 2 — GitHub API client (Octokit)
+│       └── src/
+│           ├── index.ts
+│           ├── routes/
+│           │   ├── auth.ts
+│           │   ├── repos.ts
+│           │   ├── webhooks.ts
+│           │   └── analytics.ts        Phase 3 — coming
+│           ├── queues/sync.queue.ts
+│           ├── workers/sync.worker.ts
+│           └── lib/github.ts
 ├── packages/
-│   └── types/                  Shared TypeScript types
+│   └── types/src/index.ts      Shared TypeScript types
 ├── docker-compose.yml
+├── pnpm-workspace.yaml
+├── tsconfig.base.json
 └── CLAUDE.md
 
 ## Ports
-React app  : http://localhost:5173
-API server : http://localhost:4000
-Database   : localhost:5432
-Redis      : localhost:6379
+React app     : http://localhost:5173
+API server    : http://localhost:4000
+Database      : localhost:5432
+Redis         : localhost:6379
+Prisma Studio : http://localhost:5555 (when running)
 
 ## How to start everything
 docker compose up
@@ -104,19 +133,22 @@ docker compose exec api sh -c "cd /app/apps/api && npx prisma migrate dev --name
 - Docker           : identical environment on every machine
 - BullMQ + Redis   : async job queue — handles webhook bursts without crashing
 - Octokit          : GitHub's official JS library — typed, reliable
+- Recharts         : standard charts (area, bar) — React-native, easy to use
+- D3.js            : custom charts (scatter plot, heatmap) — full control
+- date-fns         : clean typed date arithmetic for grouping and aggregation
 
 ## Phases overview
 Phase 1 : Foundation + Auth — COMPLETE ✓
-Phase 2 : GitHub data pipeline — IN PROGRESS
-Phase 3 : Analytics + charts (D3, Recharts, custom hooks)
+Phase 2 : GitHub data pipeline — COMPLETE ✓
+Phase 3 : Analytics + charts — IN PROGRESS
 Phase 4 : Real-time layer (Socket.io, Redis pub/sub)
 Phase 5 : AI review assistant (streaming SSE, OpenAI)
 Phase 6 : Production hardening (CI/CD, tests, monitoring)
 
 ## Notes for Claude
-- Explain every concept in simple language/ baby way before showing code
+- Explain every concept in simple language / baby way before showing code
 - Add comments to every line of code that is not obvious
 - Wait for confirmation that each step worked before moving on
-- This is production level - security, error handling, clean architecture
-- One step at a time - never give multiple steps at once without confirmation
+- This is production level — security, error handling, clean architecture
+- One step at a time — never give multiple steps at once without confirmation
 - Commit instructions included at the end of every step
