@@ -50,6 +50,19 @@ PHASE 3 IN PROGRESS — Analytics & Charts
 - [x] Step 9: Analytics dashboard page
 - [x] Step 10: Commit and merge Phase 3 to main
 
+## Current status
+PHASE 4 IN PROGRESS — Real-time Layer
+
+## Phase 4 checklist
+- [ ] Step 1: Understand what Phase 4 builds
+- [ ] Step 2: Install Socket.io dependencies
+- [ ] Step 3: Socket.io server setup with Redis pub/sub
+- [ ] Step 4: Emit real-time events from the sync worker
+- [ ] Step 5: React Socket.io client connection
+- [ ] Step 6: Live PR status updates in the PR list
+- [ ] Step 7: Real-time notification badge
+- [ ] Step 8: Commit and merge Phase 4 to main
+
 ## Tech stack
 Frontend  : React 19, TypeScript, Vite 6, TanStack Query v5, Zustand, Recharts, D3
 Backend   : Node.js, Express, TypeScript
@@ -140,8 +153,8 @@ docker compose exec api sh -c "cd /app/apps/api && npx prisma migrate dev --name
 ## Phases overview
 Phase 1 : Foundation + Auth — COMPLETE ✓
 Phase 2 : GitHub data pipeline — COMPLETE ✓
-Phase 3 : Analytics + charts — IN PROGRESS
-Phase 4 : Real-time layer (Socket.io, Redis pub/sub)
+Phase 3 : Analytics + charts — COMPLETE ✓
+Phase 4 : Real-time layer (Socket.io, Redis pub/sub) - IN PROGRESS
 Phase 5 : AI review assistant (streaming SSE, OpenAI)
 Phase 6 : Production hardening (CI/CD, tests, monitoring)
 
