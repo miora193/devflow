@@ -42,8 +42,8 @@ PHASE 3 IN PROGRESS — Analytics & Charts
 - [x] Step 1: Understand what Phase 3 builds
 - [x] Step 2: Install chart dependencies (Recharts, D3, date-fns)
 - [x] Step 3: Analytics API endpoints (cycle time, velocity, review stats)
-- [ ] Step 4: Analytics React Query hooks
-- [ ] Step 5: PR cycle time chart (D3 scatter plot)
+- [x] Step 4: Analytics React Query hooks
+- [x] Step 5: PR cycle time chart (D3 scatter plot)
 - [ ] Step 6: Team velocity chart (Recharts area chart)
 - [ ] Step 7: Review depth chart (Recharts bar chart)
 - [ ] Step 8: PR heatmap (D3 calendar heatmap)
