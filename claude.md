@@ -45,7 +45,7 @@ PHASE 3 IN PROGRESS — Analytics & Charts
 - [x] Step 4: Analytics React Query hooks
 - [x] Step 5: PR cycle time chart (D3 scatter plot)
 - [x] Step 6: Team velocity chart (Recharts area chart)
-- [ ] Step 7: Review depth chart (Recharts bar chart)
+- [x] Step 7: Review depth chart (Recharts bar chart)
 - [ ] Step 8: PR heatmap (D3 calendar heatmap)
 - [ ] Step 9: Analytics dashboard page
 - [ ] Step 10: Commit and merge Phase 3 to main
