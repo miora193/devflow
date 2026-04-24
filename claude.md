@@ -54,9 +54,9 @@ PHASE 3 IN PROGRESS — Analytics & Charts
 PHASE 4 IN PROGRESS — Real-time Layer
 
 ## Phase 4 checklist
-- [ ] Step 1: Understand what Phase 4 builds
-- [ ] Step 2: Install Socket.io dependencies
-- [ ] Step 3: Socket.io server setup with Redis pub/sub
+- [x] Step 1: Understand what Phase 4 builds
+- [x] Step 2: Install Socket.io dependencies
+- [x] Step 3: Socket.io server setup with Redis pub/sub
 - [ ] Step 4: Emit real-time events from the sync worker
 - [ ] Step 5: React Socket.io client connection
 - [ ] Step 6: Live PR status updates in the PR list
