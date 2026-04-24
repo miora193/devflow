@@ -59,7 +59,7 @@ PHASE 4 IN PROGRESS — Real-time Layer
 - [x] Step 3: Socket.io server setup with Redis pub/sub
 - [x] Step 4: Emit real-time events from the sync worker
 - [x] Step 5: React Socket.io client connection
-- [ ] Step 6: Live PR status updates in the PR list
+- [x] Step 6: Live PR status updates in the PR list
 - [ ] Step 7: Real-time notification badge
 - [ ] Step 8: Commit and merge Phase 4 to main
 
