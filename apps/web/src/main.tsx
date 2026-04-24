@@ -24,6 +24,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 // It is automatically excluded from production builds.
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { AuthProvider } from '@/context/AuthContext'
+import { SocketProvider }    from './context/SocketContext'
 
 import App from './App'
 
@@ -74,7 +75,11 @@ createRoot(rootElement).render(
 
         {/* AuthProvider wraps everything so every component can call useAuth() */}
         <AuthProvider>
-          <App />
+          {/* SocketProvider must be inside AuthProvider */}
+          {/* because it reads isAuthenticated from useAuth() */}
+          <SocketProvider>
+            <App />
+          </SocketProvider>
           <ReactQueryDevtools initialIsOpen={false} />
         </AuthProvider>
 
