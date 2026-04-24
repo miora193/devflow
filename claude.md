@@ -60,8 +60,8 @@ PHASE 4 IN PROGRESS — Real-time Layer
 - [x] Step 4: Emit real-time events from the sync worker
 - [x] Step 5: React Socket.io client connection
 - [x] Step 6: Live PR status updates in the PR list
-- [ ] Step 7: Real-time notification badge
-- [ ] Step 8: Commit and merge Phase 4 to main
+- [x] Step 7: Real-time notification badge
+- [x] Step 8: Commit and merge Phase 4 to main
 
 ## Tech stack
 Frontend  : React 19, TypeScript, Vite 6, TanStack Query v5, Zustand, Recharts, D3
