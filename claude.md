@@ -47,8 +47,8 @@ PHASE 3 IN PROGRESS — Analytics & Charts
 - [x] Step 6: Team velocity chart (Recharts area chart)
 - [x] Step 7: Review depth chart (Recharts bar chart)
 - [x] Step 8: PR heatmap (D3 calendar heatmap)
-- [ ] Step 9: Analytics dashboard page
-- [ ] Step 10: Commit and merge Phase 3 to main
+- [x] Step 9: Analytics dashboard page
+- [x] Step 10: Commit and merge Phase 3 to main
 
 ## Tech stack
 Frontend  : React 19, TypeScript, Vite 6, TanStack Query v5, Zustand, Recharts, D3
