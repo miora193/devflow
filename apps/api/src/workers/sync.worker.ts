@@ -15,7 +15,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { Worker, Job } from 'bullmq'
-import { prisma } from '../index'
+import { prisma, emitPRUpdate } from '../index'
 import { redisConnection } from '../queues/sync.queue'
 import { createGithubClient, parseFullName } from '../lib/github'
 import type { SyncPRJobData, SyncRepoJobData } from '@devflow/types'
@@ -107,9 +107,34 @@ async function processSyncPR(data: SyncPRJobData): Promise<void> {
     },
   })
 
-  // ── Fetch and save reviews for this PR ────────────────────────────────────
+// ── Fetch and save reviews for this PR ────────────────────────────────────
   // After saving the PR, fetch its reviews and save them too
   await syncReviewsForPR(octokit, owner, repo, pr.number, repositoryId)
+
+  // ── Emit real-time update ─────────────────────────────────────────────────
+  // Now that the PR is saved to the database, tell all browsers
+  // that are watching this repo about the change.
+  //
+  // emitPRUpdate publishes to Redis → Socket.io picks it up →
+  // forwards to all browsers in the "repo:{repositoryId}" room.
+  //
+  // We determine the "action" based on the PR state:
+  // merged  = PR was merged
+  // closed  = PR was closed without merging
+  // created = PR is new (we check if it existed before — simpler to use state)
+  // updated = anything else (new commits, title change, etc.)
+  const action =
+    state === 'merged'  ? 'merged'  :
+    state === 'closed'  ? 'closed'  :
+    pr.created_at === pr.updated_at ? 'created' : 'updated'
+
+  emitPRUpdate(repositoryId, {
+    action,
+    prNumber:       pr.number,
+    title:          pr.title,
+    state,
+    authorUsername: pr.user?.login || '',
+  })
 
   console.log(`PR #${prNumber} synced successfully for ${fullName}`)
 }
