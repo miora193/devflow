@@ -39,6 +39,7 @@ import webhookRoutes from './routes/webhooks'
 import './workers/sync.worker'
 
 import repoRoutes    from './routes/repos' 
+import analyticsRoutes from './routes/analytics'
 
 
 // Create the Prisma database client.
@@ -132,6 +133,8 @@ app.listen(PORT, () => {
 
 // ...after the other app.use() lines:
 app.use('/repos', repoRoutes)
+
+app.use('/analytics', analyticsRoutes)
 
 // Export app for testing purposes — test files can import the app
 // without starting the server

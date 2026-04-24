@@ -7,6 +7,11 @@ import LoginPage from '@/pages/LoginPage'
 import DashboardPage from '@/pages/DashboardPage'
 import RepositoriesPage from '@/pages/RepositoriesPage'
 import PullRequestsPage from '@/pages/PullRequestsPage'
+import CycleTimeChart from '@/components/charts/CycleTimeChart'
+import VelocityChart from '@/components/charts/VelocityChart'
+import ReviewDepthChart from '@/components/charts/ReviewDepthChart'
+import ActivityHeatmap from '@/components/charts/ActivityHeatmap'
+import AnalyticsPage from '@/pages/AnalyticsPage'
 
 
 export default function App() {
@@ -33,9 +38,16 @@ export default function App() {
         </ProtectedRoute>
       } />
 
+      <Route path="/repos/:id/analytics" element={
+        <ProtectedRoute>
+          <AnalyticsPage />
+        </ProtectedRoute>
+      } />
+
       {/* Redirect root to repos page */}
       <Route path="/" element={<Navigate to="/repos" replace />} />
       <Route path="*" element={<Navigate to="/repos" replace />} />
+
     </Routes>
   )
 }

@@ -10,7 +10,7 @@ import { usePullRequests, useSyncRepo } from '@/hooks/useRepos'
 
 // State badge colours
 const STATE_COLORS = {
-  open:   { bg: '#DCFCE7', text: '#166534' },
+  open: { bg: '#DCFCE7', text: '#166534' },
   merged: { bg: '#EDE9FE', text: '#5B21B6' },
   closed: { bg: '#FEE2E2', text: '#991B1B' },
 }
@@ -37,13 +37,13 @@ export default function PullRequestsPage() {
 
       {/* ── Navigation ── */}
       <nav style={{
-        background:   'var(--color-bg)',
+        background: 'var(--color-bg)',
         borderBottom: '1px solid var(--color-border)',
-        padding:      '0 24px',
-        height:       '60px',
-        display:      'flex',
-        alignItems:   'center',
-        gap:          '16px',
+        padding: '0 24px',
+        height: '60px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '16px',
       }}>
         <button
           onClick={() => navigate('/repos')}
@@ -63,8 +63,8 @@ export default function PullRequestsPage() {
           {/* State filter tabs */}
           <div style={{ display: 'flex', gap: '4px', background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '4px' }}>
             {[
-              { label: 'All',    value: undefined },
-              { label: 'Open',   value: 'open'   },
+              { label: 'All', value: undefined },
+              { label: 'Open', value: 'open' },
               { label: 'Merged', value: 'merged' },
               { label: 'Closed', value: 'closed' },
             ].map(({ label, value }) => (
@@ -72,15 +72,15 @@ export default function PullRequestsPage() {
                 key={label}
                 onClick={() => handleFilterChange(value)}
                 style={{
-                  padding:      '6px 14px',
+                  padding: '6px 14px',
                   borderRadius: '6px',
-                  border:       'none',
-                  fontSize:     '13px',
-                  fontWeight:   stateFilter === value ? 500 : 400,
-                  cursor:       'pointer',
-                  background:   stateFilter === value ? 'var(--color-bg-subtle)' : 'transparent',
-                  color:        stateFilter === value ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
-                  transition:   'all 0.15s',
+                  border: 'none',
+                  fontSize: '13px',
+                  fontWeight: stateFilter === value ? 500 : 400,
+                  cursor: 'pointer',
+                  background: stateFilter === value ? 'var(--color-bg-subtle)' : 'transparent',
+                  color: stateFilter === value ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+                  transition: 'all 0.15s',
                 }}
               >
                 {label}
@@ -93,16 +93,33 @@ export default function PullRequestsPage() {
             onClick={() => syncRepo.mutate(id!)}
             disabled={syncRepo.isPending}
             style={{
-              padding:      '8px 16px',
-              border:       '1px solid var(--color-border)',
+              padding: '8px 16px',
+              border: '1px solid var(--color-border)',
               borderRadius: 'var(--radius-md)',
-              background:   'transparent',
-              fontSize:     '13px',
-              cursor:       syncRepo.isPending ? 'not-allowed' : 'pointer',
-              color:        'var(--color-text-secondary)',
+              background: 'transparent',
+              fontSize: '13px',
+              cursor: syncRepo.isPending ? 'not-allowed' : 'pointer',
+              color: 'var(--color-text-secondary)',
             }}
           >
             {syncRepo.isPending ? 'Syncing...' : 'Sync now'}
+          </button>
+
+          {/* Add this button next to the existing Sync button */}
+          <button
+            onClick={() => navigate(`/repos/${id}/analytics`)}
+            style={{
+              padding: '8px 16px',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-md)',
+              background: '#534AB7',
+              fontSize: '13px',
+              cursor: 'pointer',
+              color: '#fff',
+              fontWeight: 500,
+            }}
+          >
+            Analytics
           </button>
         </div>
 
@@ -111,12 +128,12 @@ export default function PullRequestsPage() {
           <p style={{ color: 'var(--color-text-secondary)', fontSize: '14px' }}>Loading pull requests...</p>
         ) : data?.pullRequests.length === 0 ? (
           <div style={{
-            textAlign:    'center',
-            padding:      '60px 24px',
-            background:   'var(--color-bg)',
-            border:       '1px dashed var(--color-border)',
+            textAlign: 'center',
+            padding: '60px 24px',
+            background: 'var(--color-bg)',
+            border: '1px dashed var(--color-border)',
             borderRadius: 'var(--radius-lg)',
-            color:        'var(--color-text-secondary)',
+            color: 'var(--color-text-secondary)',
           }}>
             <p style={{ fontSize: '16px', margin: '0 0 8px' }}>No pull requests found</p>
             <p style={{ fontSize: '14px', margin: 0 }}>
@@ -128,22 +145,22 @@ export default function PullRequestsPage() {
             {data?.pullRequests.map(pr => {
               const colors = STATE_COLORS[pr.state as keyof typeof STATE_COLORS]
               return (
-                
-                  <a key={pr.id}
+
+                <a key={pr.id}
                   href={pr.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
-                    display:        'flex',
-                    alignItems:     'center',
-                    gap:            '16px',
-                    background:     'var(--color-bg)',
-                    border:         '1px solid var(--color-border)',
-                    borderRadius:   'var(--radius-lg)',
-                    padding:        '16px 20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '16px',
+                    background: 'var(--color-bg)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: '16px 20px',
                     textDecoration: 'none',
-                    color:          'inherit',
-                    transition:     'border-color 0.15s',
+                    color: 'inherit',
+                    transition: 'border-color 0.15s',
                   }}
                   onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--color-accent)')}
                   onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--color-border)')}
@@ -160,13 +177,13 @@ export default function PullRequestsPage() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                       {/* State badge */}
                       <span style={{
-                        fontSize:     '11px',
-                        fontWeight:   500,
-                        padding:      '2px 8px',
+                        fontSize: '11px',
+                        fontWeight: 500,
+                        padding: '2px 8px',
                         borderRadius: 'var(--radius-full)',
-                        background:   colors.bg,
-                        color:        colors.text,
-                        flexShrink:   0,
+                        background: colors.bg,
+                        color: colors.text,
+                        flexShrink: 0,
                       }}>
                         {pr.state}
                       </span>
@@ -205,13 +222,13 @@ export default function PullRequestsPage() {
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1 || isFetching}
               style={{
-                padding:      '8px 16px',
-                border:       '1px solid var(--color-border)',
+                padding: '8px 16px',
+                border: '1px solid var(--color-border)',
                 borderRadius: 'var(--radius-md)',
-                background:   'transparent',
-                cursor:       page === 1 ? 'not-allowed' : 'pointer',
-                fontSize:     '13px',
-                color:        'var(--color-text-secondary)',
+                background: 'transparent',
+                cursor: page === 1 ? 'not-allowed' : 'pointer',
+                fontSize: '13px',
+                color: 'var(--color-text-secondary)',
               }}
             >
               Previous
@@ -226,13 +243,13 @@ export default function PullRequestsPage() {
               onClick={() => setPage(p => p + 1)}
               disabled={!data.pagination.hasMore || isFetching}
               style={{
-                padding:      '8px 16px',
-                border:       '1px solid var(--color-border)',
+                padding: '8px 16px',
+                border: '1px solid var(--color-border)',
                 borderRadius: 'var(--radius-md)',
-                background:   'transparent',
-                cursor:       !data.pagination.hasMore ? 'not-allowed' : 'pointer',
-                fontSize:     '13px',
-                color:        'var(--color-text-secondary)',
+                background: 'transparent',
+                cursor: !data.pagination.hasMore ? 'not-allowed' : 'pointer',
+                fontSize: '13px',
+                color: 'var(--color-text-secondary)',
               }}
             >
               Next
