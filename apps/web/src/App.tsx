@@ -10,6 +10,7 @@ import PullRequestsPage from '@/pages/PullRequestsPage'
 import CycleTimeChart from '@/components/charts/CycleTimeChart'
 import VelocityChart from '@/components/charts/VelocityChart'
 import ReviewDepthChart from '@/components/charts/ReviewDepthChart'
+import ActivityHeatmap from '@/components/charts/ActivityHeatmap'
 
 
 export default function App() {
@@ -104,6 +105,40 @@ export default function App() {
                   { authorUsername: 'raise', totalPRs: 3, avgComments: 1.0, avgReviews: 1.0, avgChangesRequested: 0.0 },
                 ],
                 totalPRsAnalysed: 28,
+              }} />
+            </div>
+
+            {/* Activity heatmap */}
+            <div>
+              <h2 style={{ marginBottom: '16px', fontSize: '16px', fontWeight: 600 }}>
+                PR Activity — Last 365 Days
+              </h2>
+              <ActivityHeatmap data={{
+                days: (() => {
+                  // Generate 365 days of fake data programmatically
+                  const days = []
+                  const now = new Date()
+                  for (let i = 364; i >= 0; i--) {
+                    const date = new Date(now)
+                    date.setDate(date.getDate() - i)
+                    const dateStr = date.toISOString().split('T')[0]
+                    // Random activity — weekdays more active than weekends
+                    const dow = date.getDay()
+                    const isWeekend = dow === 0 || dow === 6
+                    const count = isWeekend
+                      ? Math.random() < 0.15 ? Math.floor(Math.random() * 2) + 1 : 0
+                      : Math.random() < 0.6 ? Math.floor(Math.random() * 5) + 1 : 0
+                    const intensity =
+                      count === 0 ? 0 :
+                        count === 1 ? 1 :
+                          count === 2 ? 2 :
+                            count <= 4 ? 3 : 4
+                    days.push({ date: dateStr, count, intensity: intensity as 0 | 1 | 2 | 3 | 4 })
+                  }
+                  return days
+                })(),
+                maxCount: 6,
+                totalPRs: 280,
               }} />
             </div>
 
