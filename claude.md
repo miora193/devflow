@@ -71,8 +71,8 @@ PHASE 5 IN PROGRESS — AI Review Assistant
 - [x] Step 3: AI review API endpoint with streaming SSE
 - [x] Step 4: React streaming hook (useAIReview)
 - [x] Step 5: AI review panel component
-- [ ] Step 6: Wire up to the PR list page
-- [ ] Step 7: Commit and merge Phase 5 to main
+- [x] Step 6: Wire up to the PR list page
+- [x] Step 7: Commit and merge Phase 5 to main
 
 ## Tech stack
 Frontend  : React 19, TypeScript, Vite 6, TanStack Query v5, Zustand, Recharts, D3
