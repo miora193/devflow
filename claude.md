@@ -63,7 +63,7 @@ PHASE 3 IN PROGRESS — Analytics & Charts
 
 
 ## Current status
-PHASE 5 IN PROGRESS — AI Review Assistant
+PHASE 5 - AI Review Assistant
 
 ## Phase 5 checklist
 - [x] Step 1: Understand what Phase 5 builds
@@ -73,6 +73,20 @@ PHASE 5 IN PROGRESS — AI Review Assistant
 - [x] Step 5: AI review panel component
 - [x] Step 6: Wire up to the PR list page
 - [x] Step 7: Commit and merge Phase 5 to main
+
+## Current status
+PHASE 6 IN PROGRESS — Production Hardening
+
+## Phase 6 checklist
+- [ ] Step 1: Understand what Phase 6 builds
+- [ ] Step 2: ESLint + Prettier — code quality rules
+- [ ] Step 3: Vitest — unit tests for the sync worker and analytics
+- [ ] Step 4: GitHub Actions CI — runs lint and tests on every PR
+- [ ] Step 5: API error handling middleware — consistent error responses
+- [ ] Step 6: Request logging with Morgan
+- [ ] Step 7: Health check endpoint improvements
+- [ ] Step 8: Commit and merge Phase 6 to main
+
 
 ## Tech stack
 Frontend  : React 19, TypeScript, Vite 6, TanStack Query v5, Zustand, Recharts, D3
@@ -165,8 +179,8 @@ docker compose exec api sh -c "cd /app/apps/api && npx prisma migrate dev --name
 Phase 1 : Foundation + Auth — COMPLETE ✓
 Phase 2 : GitHub data pipeline — COMPLETE ✓
 Phase 3 : Analytics + charts — COMPLETE ✓
-Phase 4 : Real-time layer (Socket.io, Redis pub/sub) - IN PROGRESS
-Phase 5 : AI review assistant (streaming SSE, OpenAI)
+Phase 4 : Real-time layer (Socket.io, Redis pub/sub) — COMPLETE ✓
+Phase 5 : AI review assistant (streaming SSE, OpenAI) — COMPLETE ✓
 Phase 6 : Production hardening (CI/CD, tests, monitoring)
 
 ## Notes for Claude
