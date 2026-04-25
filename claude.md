@@ -70,7 +70,7 @@ PHASE 5 IN PROGRESS — AI Review Assistant
 - [x] Step 2: Install AI dependencies (OpenAI SDK, eventsource-parser)
 - [x] Step 3: AI review API endpoint with streaming SSE
 - [x] Step 4: React streaming hook (useAIReview)
-- [ ] Step 5: AI review panel component
+- [x] Step 5: AI review panel component
 - [ ] Step 6: Wire up to the PR list page
 - [ ] Step 7: Commit and merge Phase 5 to main
 
