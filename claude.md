@@ -38,7 +38,7 @@ PHASE 3 IN PROGRESS — Analytics & Charts
 - React repositories page and PR list page
 - Merged to main — tagged v0.2.0
 
-## Phase 3 checklist
+## Phase 3 checklist — COMPLETE ✓
 - [x] Step 1: Understand what Phase 3 builds
 - [x] Step 2: Install chart dependencies (Recharts, D3, date-fns)
 - [x] Step 3: Analytics API endpoints (cycle time, velocity, review stats)
@@ -50,10 +50,8 @@ PHASE 3 IN PROGRESS — Analytics & Charts
 - [x] Step 9: Analytics dashboard page
 - [x] Step 10: Commit and merge Phase 3 to main
 
-## Current status
-PHASE 4 IN PROGRESS — Real-time Layer
 
-## Phase 4 checklist
+## Phase 4 checklist — COMPLETE ✓
 - [x] Step 1: Understand what Phase 4 builds
 - [x] Step 2: Install Socket.io dependencies
 - [x] Step 3: Socket.io server setup with Redis pub/sub
@@ -62,6 +60,19 @@ PHASE 4 IN PROGRESS — Real-time Layer
 - [x] Step 6: Live PR status updates in the PR list
 - [x] Step 7: Real-time notification badge
 - [x] Step 8: Commit and merge Phase 4 to main
+
+
+## Current status
+PHASE 5 IN PROGRESS — AI Review Assistant
+
+## Phase 5 checklist
+- [ ] Step 1: Understand what Phase 5 builds
+- [ ] Step 2: Install AI dependencies (OpenAI SDK, eventsource-parser)
+- [ ] Step 3: AI review API endpoint with streaming SSE
+- [ ] Step 4: React streaming hook (useAIReview)
+- [ ] Step 5: AI review panel component
+- [ ] Step 6: Wire up to the PR list page
+- [ ] Step 7: Commit and merge Phase 5 to main
 
 ## Tech stack
 Frontend  : React 19, TypeScript, Vite 6, TanStack Query v5, Zustand, Recharts, D3
