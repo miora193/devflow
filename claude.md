@@ -68,7 +68,7 @@ PHASE 5 IN PROGRESS — AI Review Assistant
 ## Phase 5 checklist
 - [x] Step 1: Understand what Phase 5 builds
 - [x] Step 2: Install AI dependencies (OpenAI SDK, eventsource-parser)
-- [ ] Step 3: AI review API endpoint with streaming SSE
+- [x] Step 3: AI review API endpoint with streaming SSE
 - [ ] Step 4: React streaming hook (useAIReview)
 - [ ] Step 5: AI review panel component
 - [ ] Step 6: Wire up to the PR list page
