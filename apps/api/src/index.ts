@@ -23,6 +23,8 @@ import webhookRoutes   from './routes/webhooks'
 import repoRoutes      from './routes/repos'
 import analyticsRoutes from './routes/analytics'
 import './workers/sync.worker'
+import aiRoutes from './routes/ai'
+
 
 // ── Prisma client ─────────────────────────────────────────────────────────────
 // Created once and exported — every route file imports this single instance.
@@ -188,6 +190,7 @@ process.on('SIGINT', async () => {
   process.exit(0)
 })
 
+app.use('/ai', aiRoutes)
 
 // ── Start the server ──────────────────────────────────────────────────────────
 // Note: httpServer.listen() not app.listen()
