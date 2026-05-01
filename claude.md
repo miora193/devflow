@@ -75,7 +75,18 @@ PHASE 5 - AI Review Assistant
 - [x] Step 7: Commit and merge Phase 5 to main
 
 ## Current status
-PHASE 6 IN PROGRESS — Production Hardening
+PHASE 6 IN PROGRESS — Production + Deployment
+
+## Phase 6 checklist
+- [x] Step 1: Understand the deployment plan
+- [ ] Step 2: ESLint + Prettier
+- [ ] Step 3: GitHub Actions CI
+- [ ] Step 4: Prepare app for production
+- [ ] Step 5: Deploy PostgreSQL on Neon
+- [ ] Step 6: Deploy Redis on Upstash
+- [ ] Step 7: Deploy API on Render
+- [ ] Step 8: Deploy frontend on Vercel
+- [ ] Step 9: Connect everything + go live
 
 ## Phase 6 checklist
 - [ ] Step 1: Understand what Phase 6 builds

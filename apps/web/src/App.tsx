@@ -7,10 +7,6 @@ import LoginPage from '@/pages/LoginPage'
 import DashboardPage from '@/pages/DashboardPage'
 import RepositoriesPage from '@/pages/RepositoriesPage'
 import PullRequestsPage from '@/pages/PullRequestsPage'
-import CycleTimeChart from '@/components/charts/CycleTimeChart'
-import VelocityChart from '@/components/charts/VelocityChart'
-import ReviewDepthChart from '@/components/charts/ReviewDepthChart'
-import ActivityHeatmap from '@/components/charts/ActivityHeatmap'
 import AnalyticsPage from '@/pages/AnalyticsPage'
 
 
