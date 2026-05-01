@@ -7,7 +7,7 @@
 //   - Badge clears when user navigates to that repo's PR list
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate }    from 'react-router-dom'
 import { useRepos, useConnectRepo, useSyncRepo } from '@/hooks/useRepos'
 import { useAuth }        from '@/context/AuthContext'
@@ -51,7 +51,7 @@ export default function RepositoriesPage() {
     })
 
     // Listen for PR updates
-    const handleUpdate = (event: PRUpdateEvent & { repoId?: string }) => {
+    const handleUpdate = (_event: PRUpdateEvent & { repoId?: string }) => {
       // The server does not currently send repoId in the payload.
       // We will handle this by checking which room the event came from.
       // For now, increment the badge for the room we are in.

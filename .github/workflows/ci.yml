@@ -49,7 +49,6 @@ jobs:
   api:
     name: Type check — API
     runs-on: ubuntu-latest
-    # Wait for types to pass first
     needs: types
     steps:
       - name: Checkout code
@@ -68,6 +67,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
+
+      - name: Generate Prisma client
+        run: cd apps/api && npx prisma generate
 
       - name: Type check API
         run: cd apps/api && npx tsc --noEmit
@@ -95,16 +97,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Generate Prisma client
+        run: cd apps/api && npx prisma generate
+
       - name: Type check web
         run: cd apps/web && npx tsc --noEmit
 
       - name: Build web
-        # This confirms the React app builds successfully for production
-        # VITE_API_URL is set to a placeholder — the build just needs the var to exist
         run: cd apps/web && npx vite build
         env:
           VITE_API_URL: https://placeholder.example.com
-
+          
   # ── Lint the frontend ─────────────────────────────────────────────────────────
   lint:
     name: ESLint — Web

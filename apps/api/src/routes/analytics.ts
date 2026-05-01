@@ -40,7 +40,7 @@ function requireAuth(req: Request, res: Response, next: Function) {
 
   if (!token) {
     return res.status(401).json({
-      error:   'NOT_AUTHENTICATED',
+      error: 'NOT_AUTHENTICATED',
       message: 'You must be logged in to view analytics',
     })
   }
@@ -51,7 +51,7 @@ function requireAuth(req: Request, res: Response, next: Function) {
   } catch {
     res.clearCookie('auth_token')
     return res.status(401).json({
-      error:   'SESSION_EXPIRED',
+      error: 'SESSION_EXPIRED',
       message: 'Your session has expired. Please log in again.',
     })
   }
@@ -110,7 +110,7 @@ router.get('/:repoId/cycle-time', async (req: Request, res: Response) => {
   const mergedPRs = await prisma.pullRequest.findMany({
     where: {
       repositoryId: repoId,
-      state:        'merged',
+      state: 'merged',
       // githubMergedAt is when it was merged — we want PRs merged recently
       githubMergedAt: { gte: since },
     },
@@ -122,69 +122,69 @@ router.get('/:repoId/cycle-time', async (req: Request, res: Response) => {
 
   if (mergedPRs.length === 0) {
     return res.json({
-      points:               [],
+      points: [],
       averageCycleTimeDays: 0,
-      medianCycleTimeDays:  0,
-      totalMergedPRs:       0,
+      medianCycleTimeDays: 0,
+      totalMergedPRs: 0,
     })
   }
 
   // Calculate cycle time for each PR
   const points = mergedPRs
-    .filter(pr => pr.githubMergedAt && pr.githubCreatedAt)
-    .map(pr => {
-      const openedAt  = new Date(pr.githubCreatedAt)
-      const mergedAt  = new Date(pr.githubMergedAt!)
+    .filter((pr: any) => pr.githubMergedAt && pr.githubCreatedAt)
+    .map((pr: any) => {
+      const openedAt = new Date(pr.githubCreatedAt)
+      const mergedAt = new Date(pr.githubMergedAt!)
 
       // differenceInHours from date-fns calculates exact hours between two dates
       const cycleTimeHours = differenceInHours(mergedAt, openedAt)
-      const cycleTimeDays  = differenceInDays(mergedAt, openedAt)
+      const cycleTimeDays = differenceInDays(mergedAt, openedAt)
 
       return {
-        prNumber:       pr.githubNumber,
-        title:          pr.title,
-        openedAt:       pr.githubCreatedAt.toISOString(),
+        prNumber: pr.githubNumber,
+        title: pr.title,
+        openedAt: pr.githubCreatedAt.toISOString(),
         cycleTimeHours,
         // Round to 1 decimal place for display e.g. "2.5 days"
-        cycleTimeDays:  Math.round(cycleTimeDays * 10) / 10,
+        cycleTimeDays: Math.round(cycleTimeDays * 10) / 10,
         authorUsername: pr.authorUsername,
       }
     })
     // Filter out PRs with zero cycle time (likely test/draft PRs merged instantly)
     .filter(p => p.cycleTimeHours > 0)
 
- // Guard — if all PRs were filtered out (zero cycle time), return empty
+  // Guard — if all PRs were filtered out (zero cycle time), return empty
   if (points.length === 0) {
     return res.json({
-      points:               [],
+      points: [],
       averageCycleTimeDays: 0,
-      medianCycleTimeDays:  0,
-      totalMergedPRs:       0,
+      medianCycleTimeDays: 0,
+      totalMergedPRs: 0,
     })
   }
 
   // Calculate average cycle time
-  const totalHours  = points.reduce((sum, p) => sum + p.cycleTimeHours, 0)
+  const totalHours = points.reduce((sum, p) => sum + p.cycleTimeHours, 0)
   const averageDays = Math.round((totalHours / points.length / 24) * 10) / 10
 
   // Calculate median — sort by cycle time, take the middle value.
   // Median is better than average here because one very long PR
   // would skew the average badly.
   // We guard sorted.length > 0 above so this is safe.
-  const sorted      = [...points].sort((a, b) => a.cycleTimeHours - b.cycleTimeHours)
-  const mid         = Math.floor(sorted.length / 2)
+  const sorted = [...points].sort((a, b) => a.cycleTimeHours - b.cycleTimeHours)
+  const mid = Math.floor(sorted.length / 2)
   const medianHours = sorted.length === 1
     ? sorted[0].cycleTimeHours                                              // only one PR
     : sorted.length % 2 !== 0
       ? sorted[mid].cycleTimeHours                                          // odd count
       : (sorted[mid - 1].cycleTimeHours + sorted[mid].cycleTimeHours) / 2  // even count
-  const medianDays  = Math.round((medianHours / 24) * 10) / 10
+  const medianDays = Math.round((medianHours / 24) * 10) / 10
 
   return res.json({
     points,
     averageCycleTimeDays: averageDays,
-    medianCycleTimeDays:  medianDays,
-    totalMergedPRs:       points.length,
+    medianCycleTimeDays: medianDays,
+    totalMergedPRs: points.length,
   })
 })
 
@@ -210,14 +210,14 @@ router.get('/:repoId/velocity', async (req: Request, res: Response) => {
   // We need both opened and merged dates so we fetch all and filter
   const prs = await prisma.pullRequest.findMany({
     where: {
-      repositoryId:    repoId,
+      repositoryId: repoId,
       githubCreatedAt: { gte: since },
     },
     select: {
       // Only select the fields we need — faster query
       githubCreatedAt: true,
-      githubMergedAt:  true,
-      state:           true,
+      githubMergedAt: true,
+      state: true,
     },
   })
 
@@ -239,10 +239,11 @@ router.get('/:repoId/velocity', async (req: Request, res: Response) => {
     weekEnd.setDate(weekEnd.getDate() + 7)
 
     // Count PRs opened this week
-    const opened = prs.filter(pr => {
+    const opened = prs.filter((pr: any) => {
       const opened = new Date(pr.githubCreatedAt)
       return opened >= weekStart && opened < weekEnd
     }).length
+
 
     // Count PRs merged this week
     const merged = prs.filter(pr => {
@@ -263,19 +264,19 @@ router.get('/:repoId/velocity', async (req: Request, res: Response) => {
 
   // Remove weeks at the end with no activity (trailing zeros look odd on chart)
   const lastActiveIndex = [...points].reverse().findIndex(p => p.opened > 0 || p.merged > 0)
-  const trimmedPoints   = lastActiveIndex >= 0
+  const trimmedPoints = lastActiveIndex >= 0
     ? points.slice(0, points.length - lastActiveIndex)
     : points
 
   // Calculate average PRs merged per week
-  const totalMerged    = trimmedPoints.reduce((sum, p) => sum + p.merged, 0)
+  const totalMerged = trimmedPoints.reduce((sum, p) => sum + p.merged, 0)
   const avgMergedPerWeek = trimmedPoints.length > 0
     ? Math.round((totalMerged / trimmedPoints.length) * 10) / 10
     : 0
 
   return res.json({
-    points:              trimmedPoints,
-    weeksOfData:         trimmedPoints.length,
+    points: trimmedPoints,
+    weeksOfData: trimmedPoints.length,
     averageMergedPerWeek: avgMergedPerWeek,
   })
 })
@@ -301,13 +302,13 @@ router.get('/:repoId/review-depth', async (req: Request, res: Response) => {
   // Fetch PRs with their review counts
   const prs = await prisma.pullRequest.findMany({
     where: {
-      repositoryId:    repoId,
+      repositoryId: repoId,
       githubCreatedAt: { gte: since },
     },
     select: {
-      authorUsername:  true,
-      commentsCount:   true,
-      reviewsCount:    true,
+      authorUsername: true,
+      commentsCount: true,
+      reviewsCount: true,
       // Include the actual reviews to count changes requested
       reviews: {
         select: { state: true }
@@ -322,27 +323,27 @@ router.get('/:repoId/review-depth', async (req: Request, res: Response) => {
   // Group PRs by author using a Map
   // A Map is like an object but keys can be anything and it preserves insertion order
   const authorMap = new Map<string, {
-    totalPRs:             number
-    totalComments:        number
-    totalReviews:         number
+    totalPRs: number
+    totalComments: number
+    totalReviews: number
     totalChangesRequested: number
   }>()
 
   for (const pr of prs) {
     const existing = authorMap.get(pr.authorUsername) || {
-      totalPRs:             0,
-      totalComments:        0,
-      totalReviews:         0,
+      totalPRs: 0,
+      totalComments: 0,
+      totalReviews: 0,
       totalChangesRequested: 0,
     }
 
     // Count how many times "CHANGES_REQUESTED" was used on this PR
-    const changesRequested = pr.reviews.filter(r => r.state === 'CHANGES_REQUESTED').length
+    const changesRequested = pr.reviews.filter((r: any) => r.state === 'CHANGES_REQUESTED').length
 
     authorMap.set(pr.authorUsername, {
-      totalPRs:             existing.totalPRs + 1,
-      totalComments:        existing.totalComments + pr.commentsCount,
-      totalReviews:         existing.totalReviews + pr.reviewsCount,
+      totalPRs: existing.totalPRs + 1,
+      totalComments: existing.totalComments + pr.commentsCount,
+      totalReviews: existing.totalReviews + pr.reviewsCount,
       totalChangesRequested: existing.totalChangesRequested + changesRequested,
     })
   }
@@ -351,10 +352,10 @@ router.get('/:repoId/review-depth', async (req: Request, res: Response) => {
   const authors = Array.from(authorMap.entries())
     .map(([authorUsername, stats]) => ({
       authorUsername,
-      totalPRs:           stats.totalPRs,
+      totalPRs: stats.totalPRs,
       // Round to 1 decimal place: 2.3 comments per PR
-      avgComments:        Math.round((stats.totalComments / stats.totalPRs) * 10) / 10,
-      avgReviews:         Math.round((stats.totalReviews / stats.totalPRs) * 10) / 10,
+      avgComments: Math.round((stats.totalComments / stats.totalPRs) * 10) / 10,
+      avgReviews: Math.round((stats.totalReviews / stats.totalPRs) * 10) / 10,
       avgChangesRequested: Math.round((stats.totalChangesRequested / stats.totalPRs) * 10) / 10,
     }))
     // Sort by most PRs first so busiest authors appear first on the chart
@@ -389,7 +390,7 @@ router.get('/:repoId/heatmap', async (req: Request, res: Response) => {
   // Fetch all PR activity dates in the last year
   const prs = await prisma.pullRequest.findMany({
     where: {
-      repositoryId:    repoId,
+      repositoryId: repoId,
       githubCreatedAt: { gte: since },
     },
     select: {
@@ -418,17 +419,17 @@ router.get('/:repoId/heatmap', async (req: Request, res: Response) => {
   // Build the heatmap data — one entry per day
   const days = allDays.map(day => {
     const dateStr = format(day, 'yyyy-MM-dd')
-    const count   = countByDay.get(dateStr) || 0
+    const count = countByDay.get(dateStr) || 0
 
     // Calculate intensity level 0-4 based on count relative to max
     // 0 = no activity, 4 = the busiest day
     let intensity: 0 | 1 | 2 | 3 | 4 = 0
     if (count > 0 && maxCount > 0) {
       const ratio = count / maxCount
-      if (ratio > 0.75)     intensity = 4
+      if (ratio > 0.75) intensity = 4
       else if (ratio > 0.5) intensity = 3
       else if (ratio > 0.25) intensity = 2
-      else                  intensity = 1
+      else intensity = 1
     }
 
     return { date: dateStr, count, intensity }

@@ -13,7 +13,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { Router, Request, Response } from 'express'
-import jwt     from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
 import OpenAI from 'openai'  // Groq is OpenAI-compatible — same SDK
 import { prisma } from '../index'
 import type { AuthUser } from '@devflow/types'
@@ -29,7 +29,7 @@ const router = Router()
 
 // Groq uses the same OpenAI SDK format — just a different baseURL and key
 const openai = new OpenAI({
-  apiKey:  process.env.GROQ_API_KEY,
+  apiKey: process.env.GROQ_API_KEY,
   baseURL: 'https://api.groq.com/openai/v1',
 })
 
@@ -106,26 +106,26 @@ router.post('/review/:prId', async (req: Request, res: Response) => {
   // These help the AI give more useful analysis.
 
   // How many days was the PR open before merging/closing?
-  const openDate    = new Date(pr.githubCreatedAt)
-  const closeDate   = pr.githubMergedAt
+  const openDate = new Date(pr.githubCreatedAt)
+  const closeDate = pr.githubMergedAt
     ? new Date(pr.githubMergedAt)
     : pr.githubClosedAt
       ? new Date(pr.githubClosedAt)
       : new Date()
 
-  const daysOpen    = Math.round(
+  const daysOpen = Math.round(
     (closeDate.getTime() - openDate.getTime()) / (1000 * 60 * 60 * 24)
   )
 
   // Count review states
-  const approvals   = pr.reviews.filter(r => r.state === 'APPROVED').length
-  const changesReq  = pr.reviews.filter(r => r.state === 'CHANGES_REQUESTED').length
-  const reviewers   = [...new Set(pr.reviews.map(r => r.reviewerUsername))]
+  const approvals = pr.reviews.filter((r: any) => r.state === 'APPROVED').length
+  const changesReq = pr.reviews.filter((r: any) => r.state === 'CHANGES_REQUESTED').length
+  const reviewers = [...new Set(pr.reviews.map((r: any) => r.reviewerUsername))]
 
   // Risk signals — things that might indicate a risky PR
-  const isLargePR   = pr.changedFiles > 20 || pr.additions + pr.deletions > 500
+  const isLargePR = pr.changedFiles > 20 || pr.additions + pr.deletions > 500
   const hasNoReview = pr.reviewsCount === 0
-  const longCycle   = daysOpen > 7
+  const longCycle = daysOpen > 7
 
   // ── Step 4: Build the prompt ──────────────────────────────────────────────
   // The prompt tells the AI exactly what to analyse and how to respond.
@@ -179,10 +179,10 @@ Keep the response concise and practical. Use plain language. No need to repeat t
   // Cache-Control: no-cache          → do not cache streaming responses
   // Connection: keep-alive           → keep the connection open
   // X-Accel-Buffering: no            → disable nginx buffering (important for SSE)
-  res.setHeader('Content-Type',     'text/event-stream')
-  res.setHeader('Cache-Control',    'no-cache')
-  res.setHeader('Connection',       'keep-alive')
-  res.setHeader('X-Accel-Buffering','no')
+  res.setHeader('Content-Type', 'text/event-stream')
+  res.setHeader('Cache-Control', 'no-cache')
+  res.setHeader('Connection', 'keep-alive')
+  res.setHeader('X-Accel-Buffering', 'no')
 
   // ── Helper: send one SSE chunk to the browser ─────────────────────────────
   // SSE format requires each message to start with "data: " and end with "\n\n"
@@ -196,11 +196,11 @@ Keep the response concise and practical. Use plain language. No need to repeat t
     // stream: true tells OpenAI to send the response word by word
     // instead of waiting for the full response to be generated.
     const stream = await openai.chat.completions.create({
-    //   model: 'gpt-4o-mini', // fast and cost-effective for this use case
+      //   model: 'gpt-4o-mini', // fast and cost-effective for this use case
       model: 'llama-3.1-8b-instant', // Groq's free fast model
       messages: [
         {
-          role:    'user',
+          role: 'user',
           content: prompt,
         },
       ],
@@ -272,12 +272,12 @@ router.post('/review/:prId/quick', async (req: Request, res: Response) => {
   const pr = await prisma.pullRequest.findUnique({
     where: { id: prId },
     select: {
-      githubNumber:  true,
-      title:         true,
-      changedFiles:  true,
-      additions:     true,
-      deletions:     true,
-      reviewsCount:  true,
+      githubNumber: true,
+      title: true,
+      changedFiles: true,
+      additions: true,
+      deletions: true,
+      reviewsCount: true,
       authorUsername: true,
     },
   })
@@ -286,11 +286,11 @@ router.post('/review/:prId/quick', async (req: Request, res: Response) => {
 
   try {
     const response = await openai.chat.completions.create({
-      model:      'gpt-4o-mini',
+      model: 'gpt-4o-mini',
       max_tokens: 30, // very short — just a label
       temperature: 0.3,
       messages: [{
-        role:    'user',
+        role: 'user',
         content: `PR: "${pr.title}", ${pr.changedFiles} files, +${pr.additions}/-${pr.deletions} lines, ${pr.reviewsCount} reviews.
                   Give a 4-6 word label for this PR type. Examples: "Refactor with broad impact", "Small bug fix", "Large feature addition", "Config change, low risk". Reply with ONLY the label, nothing else.`,
       }],
