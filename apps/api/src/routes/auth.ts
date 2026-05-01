@@ -12,7 +12,7 @@
 // Router is how Express lets us group related routes into separate files.
 // Instead of putting all routes in index.ts, we create a Router here
 // and register it in index.ts with: app.use('/auth', authRouter)
-import { Router, Request, Response } from 'express'
+import express, { Router, Request, Response } from 'express'
 
 // axios is a library for making HTTP requests from Node.js.
 // We use it to call the GitHub API.
@@ -32,7 +32,7 @@ import type { AuthUser } from '@devflow/types'
 
 // Create a new Router instance.
 // All routes defined below will be prefixed with /auth (set in index.ts).
-const router = Router()
+const router: express.Router = Router()
 
 
 // ─────────────────────────────────────────────────────────────────────────────

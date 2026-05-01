@@ -34,7 +34,7 @@ export const prisma = new PrismaClient({
 })
 
 // ── Express app ───────────────────────────────────────────────────────────────
-const app  = express()
+const app: express.Application = express()
 const PORT = process.env.PORT || 4000
 
 // ── Middleware ────────────────────────────────────────────────────────────────

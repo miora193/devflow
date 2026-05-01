@@ -15,7 +15,7 @@
 // All the heavy work (calling GitHub API, updating the DB) happens in the worker.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { Router, Request, Response } from 'express'
+import express, { Router, Request, Response } from 'express'
 
 // Use Node's built-in crypto module instead of @octokit/webhooks
 // This avoids an ESM/CommonJS conflict with the octokit package.
@@ -25,7 +25,7 @@ import crypto from 'crypto'
 import { prisma } from '../index'
 import { syncQueue } from '../queues/sync.queue'
 
-const router = Router()
+const router: express.Router = Router()
 
 
 // ── Signature verification function ──────────────────────────────────────────

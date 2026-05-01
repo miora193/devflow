@@ -80,7 +80,7 @@ PHASE 6 IN PROGRESS — Production + Deployment
 ## Phase 6 checklist
 - [x] Step 1: Understand the deployment plan
 - [x] Step 2: ESLint + Prettier
-- [ ] Step 3: GitHub Actions CI
+- [x] Step 3: GitHub Actions CI
 - [ ] Step 4: Prepare app for production
 - [ ] Step 5: Deploy PostgreSQL on Neon
 - [ ] Step 6: Deploy Redis on Upstash

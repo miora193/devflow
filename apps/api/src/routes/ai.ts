@@ -12,13 +12,13 @@
 //   6. Send [DONE] when finished
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { Router, Request, Response } from 'express'
+import express, { Router, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import OpenAI from 'openai'  // Groq is OpenAI-compatible — same SDK
 import { prisma } from '../index'
 import type { AuthUser } from '@devflow/types'
 
-const router = Router()
+const router: express.Router = Router()
 
 // ── Create the OpenAI client ──────────────────────────────────────────────────
 // The OpenAI constructor automatically reads OPENAI_API_KEY from the environment.

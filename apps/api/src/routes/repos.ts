@@ -12,12 +12,12 @@
 //   3. We add a "sync-repo" job to the queue to fetch all existing PRs
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { Router, Request, Response } from 'express'
+import express, { Router, Request, Response } from 'express'
 import { prisma } from '../index'
 import { syncQueue } from '../queues/sync.queue'
 import { createGithubClient } from '../lib/github'
 
-const router = Router()
+const router: express.Router = Router()
 
 
 // ─────────────────────────────────────────────────────────────────────────────

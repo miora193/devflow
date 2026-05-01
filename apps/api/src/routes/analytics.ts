@@ -12,7 +12,7 @@
 // PostgreSQL aggregation functions directly.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { Router, Request, Response } from 'express'
+import express, { Router, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import {
   differenceInHours,
@@ -29,7 +29,7 @@ import {
 import { prisma } from '../index'
 import type { AuthUser } from '@devflow/types'
 
-const router = Router()
+const router: express.Router = Router()
 
 
 // ── requireAuth middleware ────────────────────────────────────────────────────
