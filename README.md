@@ -1,3 +1,4 @@
+![CI](https://github.com/miora193/devflow/actions/workflows/ci.yml/badge.svg)
 # DevFlow
 
 > PR analytics and team insights for engineering teams.  
