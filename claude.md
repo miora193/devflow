@@ -79,7 +79,7 @@ PHASE 6 IN PROGRESS — Production + Deployment
 
 ## Phase 6 checklist
 - [x] Step 1: Understand the deployment plan
-- [ ] Step 2: ESLint + Prettier
+- [x] Step 2: ESLint + Prettier
 - [ ] Step 3: GitHub Actions CI
 - [ ] Step 4: Prepare app for production
 - [ ] Step 5: Deploy PostgreSQL on Neon
