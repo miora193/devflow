@@ -1,0 +1,26 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Render deployment config for the DevFlow API
+# Render reads this file to know how to build and start the service
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  - type: web
+    name: devflow-api
+    runtime: node
+    region: frankfurt
+    plan: free
+
+    # Build command — installs deps, generates Prisma client, compiles TypeScript
+    buildCommand: cd /opt/render/project/src && npm install -g pnpm && pnpm install && cd apps/api && npx prisma generate && pnpm run build
+
+    # Start command — runs the compiled JavaScript
+    startCommand: cd apps/api && node dist/index.js
+
+    # Health check — Render pings this to confirm the service is running
+    healthCheckPath: /health
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
