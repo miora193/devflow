@@ -24,11 +24,12 @@ import IORedis from 'ioredis'
 // process.env.REDIS_URL reads from .env — "redis://redis:6379"
 // The "redis" hostname works inside Docker because of the network we set up.
 // maxRetriesPerRequest: null is required by BullMQ — it handles retries itself
+
 export const redisConnection = new IORedis(process.env.REDIS_URL || 'redis://redis:6379', {
-  // BullMQ requires this setting — without it BullMQ throws an error on startup
-  // It means "do not limit how many times ioredis retries a failed command"
-  // BullMQ manages its own retry logic so we do not want ioredis interfering
   maxRetriesPerRequest: null,
+  // tls is required for Upstash (rediss://) in production
+  // In development with local Docker we use plain redis:// so tls is not needed
+  ...(process.env.REDIS_URL?.startsWith('rediss://') ? { tls: {} } : {}),
 })
 
 // ── Create the sync queue ─────────────────────────────────────────────────────
