@@ -34,7 +34,7 @@ export const prisma = new PrismaClient({
 })
 
 // ── Express app ───────────────────────────────────────────────────────────────
-const app  = express()
+const app: express.Application = express()
 const PORT = process.env.PORT || 4000
 
 // ── Middleware ────────────────────────────────────────────────────────────────
@@ -96,8 +96,16 @@ export const io = new Server(httpServer, {
 // We use the standard "redis" npm package here (not ioredis) because
 // the @socket.io/redis-adapter is designed to work with it.
 // ioredis is still used by BullMQ separately.
-const pubClient = createClient({ url: process.env.REDIS_URL || 'redis://redis:6379' })
-const subClient = pubClient.duplicate() // duplicate creates an identical connection
+
+const redisUrl = process.env.REDIS_URL || 'redis://redis:6379'
+
+const pubClient = createClient({
+  url: redisUrl,
+  // Upstash uses rediss:// (with TLS) — the redis client handles TLS
+  // automatically when the URL starts with rediss://
+  // No extra config needed — the URL protocol handles it
+})
+const subClient = pubClient.duplicate()
 
 // ── Connect Redis and set up the adapter ──────────────────────────────────────
 // We must connect both clients before attaching the adapter.
