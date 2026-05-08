@@ -99,15 +99,15 @@ export const io = new Server(httpServer, {
 
 const redisUrl = process.env.REDIS_URL || 'redis://redis:6379'
 
+const isTLS = redisUrl.startsWith('rediss://')
+
 const pubClient = createClient({
-  url: redisUrl,
-  socket: {
-    // Enable TLS for Upstash (rediss://) — required in production
-    tls: redisUrl.startsWith('rediss://'),
-    // Allow self-signed certs (Upstash requirement)
-    rejectUnauthorized: false,
-  },
+  url:    redisUrl,
+  socket: isTLS
+    ? { tls: true as const, rejectUnauthorized: false }
+    : undefined,
 })
+
 const subClient = pubClient.duplicate()
 
 // ── Handle Redis errors without crashing ──────────────────────────────────────
