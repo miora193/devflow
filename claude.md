@@ -81,10 +81,10 @@ PHASE 6 IN PROGRESS — Production + Deployment
 - [x] Step 1: Understand the deployment plan
 - [x] Step 2: ESLint + Prettier
 - [x] Step 3: GitHub Actions CI
-- [ ] Step 4: Prepare app for production
-- [ ] Step 5: Deploy PostgreSQL on Neon
-- [ ] Step 6: Deploy Redis on Upstash
-- [ ] Step 7: Deploy API on Render
+- [x] Step 4: Prepare app for production
+- [x] Step 5: Deploy PostgreSQL on Neon
+- [x] Step 6: Deploy Redis on Upstash
+- [x] Step 7: Deploy API on Render
 - [ ] Step 8: Deploy frontend on Vercel
 - [ ] Step 9: Connect everything + go live
 
