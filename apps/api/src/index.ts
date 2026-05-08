@@ -99,13 +99,22 @@ export const io = new Server(httpServer, {
 
 const redisUrl = process.env.REDIS_URL || 'redis://redis:6379'
 
+const isTLS = redisUrl.startsWith('rediss://')
+
 const pubClient = createClient({
-  url: redisUrl,
-  // Upstash uses rediss:// (with TLS) — the redis client handles TLS
-  // automatically when the URL starts with rediss://
-  // No extra config needed — the URL protocol handles it
+  url:    redisUrl,
+  socket: isTLS
+    ? { tls: true as const, rejectUnauthorized: false }
+    : undefined,
 })
+
 const subClient = pubClient.duplicate()
+
+// ── Handle Redis errors without crashing ──────────────────────────────────────
+// Without these handlers, any Redis error kills the entire process.
+// With them, errors are logged and the process keeps running.
+pubClient.on('error', err => console.error('Redis pub error:', err.message))
+subClient.on('error', err => console.error('Redis sub error:', err.message))
 
 // ── Connect Redis and set up the adapter ──────────────────────────────────────
 // We must connect both clients before attaching the adapter.
