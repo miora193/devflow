@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom'
-import { useAuth }     from '@/context/AuthContext'
-import { useRepos }    from '@/hooks/useRepos'
+import { useAuth } from '@/context/AuthContext'
+import { useRepos } from '@/hooks/useRepos'
 
 export default function DashboardPage() {
   const { user, logout } = useAuth()
-  const navigate         = useNavigate()
-  const { data: repos }  = useRepos()
+  const navigate = useNavigate()
+  const { data: repos } = useRepos()
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--color-bg-subtle)', fontFamily: 'var(--font-sans)' }}>
@@ -16,7 +16,12 @@ export default function DashboardPage() {
         padding: '0 24px', height: '60px', display: 'flex',
         alignItems: 'center', justifyContent: 'space-between',
       }}>
-        <span style={{ fontWeight: 600, fontSize: '18px', letterSpacing: '-0.3px' }}>DevFlow</span>
+        <span
+          onClick={() => navigate('/dashboard')}
+          style={{ fontWeight: 600, fontSize: '18px', letterSpacing: '-0.3px', cursor: 'pointer' }}
+        >
+          DevFlow
+        </span>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           <button onClick={() => navigate('/repos')}
             style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', color: 'var(--color-text-secondary)' }}>
