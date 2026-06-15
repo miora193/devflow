@@ -114,7 +114,7 @@ export default function LoginPage() {
             It goes to our API server (port 4000), not to a React route.
             The API then redirects to GitHub. */}
         
-          <a href="http://localhost:4000/auth/github"
+          <a href={`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/auth/github`}
           style={{
             display: 'flex',
             alignItems: 'center',
