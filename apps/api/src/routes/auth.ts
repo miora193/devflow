@@ -51,8 +51,7 @@ router.get('/github', (_req: Request, res: Response) => {
 
     // redirect_uri is where GitHub sends the user AFTER they approve.
     // This must exactly match what you registered on GitHub.
-    redirect_uri: 'http://localhost:4000/auth/github/callback',
-
+    redirect_uri: process.env.CALLBACK_URL || 'http://localhost:4000/auth/github/callback',
     // scope is what permissions we are asking for.
     // read:user = read their profile (username, avatar)
     // user:email = read their email address
