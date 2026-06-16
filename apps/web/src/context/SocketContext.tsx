@@ -84,9 +84,12 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 
     // ── Create the socket connection ────────────────────────────────────────
     // io() creates a WebSocket connection to our API server.
-    // withCredentials: true sends the auth cookie so the server knows who we are.
+    // This connects directly to the API (not through the /api proxy) — Vercel's
+    // rewrite proxy doesn't support tunneling persistent WebSocket upgrades to
+    // an external origin. That's fine here because the socket connection isn't
+    // used to authenticate anything; it just joins public repo rooms.
     const socket = io(
-      import.meta.env.VITE_API_URL || 'http://localhost:4000',
+      import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL || 'http://localhost:4000',
       {
         // Send the auth cookie with the connection request
         withCredentials: true,

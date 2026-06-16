@@ -111,9 +111,9 @@ export default function LoginPage() {
         )}
 
         {/* GitHub login button — this is a regular <a> link, not a React Router link.
-            It goes to our API server (port 4000), not to a React route.
-            The API then redirects to GitHub. */}
-        
+            It goes through VITE_API_URL (proxied via /api in production so the
+            OAuth callback's cookie is set as first-party, not third-party). */}
+
           <a href={`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/auth/github`}
           style={{
             display: 'flex',
