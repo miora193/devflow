@@ -27,9 +27,12 @@ import IORedis from 'ioredis'
 
 export const redisConnection = new IORedis(process.env.REDIS_URL || 'redis://redis:6379', {
   maxRetriesPerRequest: null,
-  // tls is required for Upstash (rediss://) in production
-  // In development with local Docker we use plain redis:// so tls is not needed
   ...(process.env.REDIS_URL?.startsWith('rediss://') ? { tls: {} } : {}),
+})
+
+// Prevent crash on Redis error
+redisConnection.on('error', err => {
+  console.error('BullMQ Redis error:', err.message)
 })
 
 // ── Create the sync queue ─────────────────────────────────────────────────────

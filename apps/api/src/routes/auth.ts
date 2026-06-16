@@ -221,20 +221,17 @@ router.get('/github/callback', async (req: Request, res: Response) => {
     // ── Step 7: Store the JWT in an httpOnly cookie ───────────────────────────
     // An httpOnly cookie is sent automatically with every request by the browser.
     // JavaScript on the page CANNOT read it — this protects against XSS attacks.
+    // In production, the frontend (Vercel) and API (Render) live on different
+    // domains. Cross-site fetch/XHR requests only carry cookies when the cookie
+    // is sameSite: 'none' — 'lax' only survives the initial OAuth redirect, then
+    // every later /auth/me call from the React app arrives with no cookie at all.
+    // sameSite: 'none' requires secure: true (browsers reject it otherwise).
+    const isProd = process.env.NODE_ENV === 'production'
+
     res.cookie('auth_token', token, {
       httpOnly: true,   // JS cannot read this — security feature
-
-      // secure: true means "only send over HTTPS".
-      // In development we use HTTP so this must be false.
-      // In production it MUST be true.
-      secure: process.env.NODE_ENV === 'production',
-
-      // sameSite: 'lax' means the cookie is sent on:
-      // - same-origin requests (our React app calling our API)
-      // - top-level navigations (the redirect after OAuth)
-      // But NOT on cross-origin requests from other websites.
-      // This protects against CSRF attacks.
-      sameSite: 'lax',
+      secure:   isProd, // HTTPS only in production
+      sameSite: isProd ? 'none' : 'lax',
 
       // maxAge is in milliseconds. 7 days = 7 * 24 * 60 * 60 * 1000
       maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -306,10 +303,12 @@ router.post('/logout', (_req: Request, res: Response) => {
 
   // clearCookie removes the cookie from the browser.
   // The name must exactly match what we used in res.cookie() above.
+  const isProd = process.env.NODE_ENV === 'production'
+
   res.clearCookie('auth_token', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
   })
 
   return res.json({ success: true, message: 'Logged out successfully' })
