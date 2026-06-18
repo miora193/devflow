@@ -7,16 +7,20 @@
 // we wrap Express in a native Node.js HTTP server first.
 // Socket.io attaches to that HTTP server.
 // Both HTTP and WebSocket traffic go through the same port (4000).
+//
+// NOTE on Redis adapter: we intentionally use Socket.io's default in-memory
+// adapter instead of the Redis adapter. We run a single Render instance, so
+// there is nothing to coordinate across — the Redis adapter only helps when
+// you have multiple server replicas. Removing it eliminates two persistent
+// Redis connections that Upstash (serverless Redis) would repeatedly drop.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import 'dotenv/config'
 import express         from 'express'
 import cors            from 'cors'
 import cookieParser    from 'cookie-parser'
-import { createServer } from 'http'           // ← NEW: Node.js built-in HTTP server
-import { Server }      from 'socket.io'       // ← NEW: Socket.io server
-import { createAdapter } from '@socket.io/redis-adapter' // ← NEW: Redis adapter
-import { createClient } from 'redis'          // ← NEW: Redis client for pub/sub
+import { createServer } from 'http'
+import { Server }      from 'socket.io'
 import { PrismaClient } from '@prisma/client'
 import authRoutes      from './routes/auth'
 import webhookRoutes   from './routes/webhooks'
@@ -85,51 +89,6 @@ export const io = new Server(httpServer, {
   // pingInterval: how often to send a ping to check the connection is alive
   pingInterval: 10000,
 })
-
-// ── Redis pub/sub clients ─────────────────────────────────────────────────────
-// Socket.io's Redis adapter needs TWO separate Redis connections:
-//   pubClient: publishes messages TO Redis
-//   subClient: subscribes to messages FROM Redis
-// They must be separate because a Redis connection in subscribe mode
-// cannot be used for publishing — it is a Redis limitation.
-//
-// We use the standard "redis" npm package here (not ioredis) because
-// the @socket.io/redis-adapter is designed to work with it.
-// ioredis is still used by BullMQ separately.
-
-const redisUrl = process.env.REDIS_URL || 'redis://redis:6379'
-
-const isTLS = redisUrl.startsWith('rediss://')
-
-const pubClient = createClient({
-  url:    redisUrl,
-  socket: isTLS
-    ? { tls: true as const, rejectUnauthorized: false }
-    : undefined,
-})
-
-const subClient = pubClient.duplicate()
-
-// ── Handle Redis errors without crashing ──────────────────────────────────────
-// Without these handlers, any Redis error kills the entire process.
-// With them, errors are logged and the process keeps running.
-pubClient.on('error', err => console.error('Redis pub error:', err.message))
-subClient.on('error', err => console.error('Redis sub error:', err.message))
-
-// ── Connect Redis and set up the adapter ──────────────────────────────────────
-// We must connect both clients before attaching the adapter.
-// Promise.all connects both at the same time (parallel, not sequential).
-Promise.all([pubClient.connect(), subClient.connect()])
-  .then(() => {
-    // Attach the Redis adapter to Socket.io
-    // After this, any io.to().emit() call is automatically
-    // distributed across all server instances via Redis
-    io.adapter(createAdapter(pubClient, subClient))
-    console.log('Socket.io Redis adapter connected')
-  })
-  .catch(err => {
-    console.error('Failed to connect Redis adapter:', err)
-  })
 
 
 // ── Socket.io connection handler ─────────────────────────────────────────────
@@ -202,8 +161,6 @@ export function emitPRUpdate(repoId: string, payload: {
 process.on('SIGINT', async () => {
   console.log('\nShutting down gracefully...')
   await prisma.$disconnect()
-  await pubClient.disconnect()
-  await subClient.disconnect()
   process.exit(0)
 })
 

@@ -25,9 +25,17 @@ import IORedis from 'ioredis'
 // The "redis" hostname works inside Docker because of the network we set up.
 // maxRetriesPerRequest: null is required by BullMQ — it handles retries itself
 
+// enableReadyCheck: false is required for Upstash — it skips the PING handshake
+// that Upstash's serverless Redis does not handle well on new connections.
+// rejectUnauthorized: false accepts Upstash's TLS certificate without strict CA check.
+// retryStrategy backs off gradually instead of hammering Redis on failures.
 export const redisConnection = new IORedis(process.env.REDIS_URL || 'redis://redis:6379', {
   maxRetriesPerRequest: null,
-  ...(process.env.REDIS_URL?.startsWith('rediss://') ? { tls: {} } : {}),
+  enableReadyCheck: false,
+  ...(process.env.REDIS_URL?.startsWith('rediss://') ? {
+    tls: { rejectUnauthorized: false },
+  } : {}),
+  retryStrategy: (times) => Math.min(times * 200, 5000),
 })
 
 // Prevent crash on Redis error
